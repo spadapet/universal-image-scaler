@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using OLECMDF = Microsoft.VisualStudio.OLE.Interop.OLECMDF;
 
@@ -21,13 +20,14 @@ namespace UniversalImageScaler
 
         public override void Invoke()
         {
-            VsShellUtilities.ShowMessageBox(
-                this.serviceProvider,
-                "Hello1",
-                "Hello2",
-                OLEMSGICON.OLEMSGICON_INFO,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            VSITEMSELECTION sel = this.SelectedItem;
+            if (sel.pHier != null)
+            {
+                ImageResizeItem item = new ImageResizeItem(sel);
+                ImageResizeDialog dialog = new ImageResizeDialog(item);
+
+                dialog.ShowDialog();
+            }
         }
 
         public override int OleStatus
@@ -36,7 +36,7 @@ namespace UniversalImageScaler
             {
                 OLECMDF status = 0;
 
-                if (SelectedItem.pHier != null)
+                if (this.SelectedItem.pHier != null)
                 {
                     status = OLECMDF.OLECMDF_ENABLED | OLECMDF.OLECMDF_SUPPORTED;
                 }
