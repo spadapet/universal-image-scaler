@@ -1,18 +1,20 @@
 ﻿using System.Windows;
+using Microsoft.VisualStudio.PlatformUI;
 
 namespace UniversalImageScaler
 {
-    internal partial class ImageResizeDialog : Window
+    internal partial class ImageResizeDialog : DialogWindow
     {
-        private ImageResizeItem item;
+        private ImageResizeInfo item;
 
         public ImageResizeDialog()
             : this(null)
         {
         }
 
-        public ImageResizeDialog(ImageResizeItem item)
+        public ImageResizeDialog(ImageResizeInfo item)
         {
+            this.item = item;
             this.DataContext = item;
 
             InitializeComponent();

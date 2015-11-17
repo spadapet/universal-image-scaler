@@ -23,10 +23,21 @@ namespace UniversalImageScaler
             VSITEMSELECTION sel = this.SelectedItem;
             if (sel.pHier != null)
             {
-                ImageResizeItem item = new ImageResizeItem(sel);
-                ImageResizeDialog dialog = new ImageResizeDialog(item);
+                bool? result = null;
 
-                dialog.ShowDialog();
+                try
+                {
+                    ImageResizeInfo item = new ImageResizeInfo(sel);
+                    ImageResizeDialog dialog = new ImageResizeDialog(item);
+                    result = dialog.ShowModal();
+                }
+                catch (ArgumentException)
+                {
+                }
+
+                if (result.HasValue && result.Value)
+                {
+                }
             }
         }
 
