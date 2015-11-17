@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="universal_image_scaler.Peter Spada.7d4f0e00-00ae-49fa-bfe7-d3ffb5384d50" Version="1.0" Language="en-US" Publisher="Peter Spada" />
-    <DisplayName>universal_image_scaler</DisplayName>
-    <Description>Empty VSIX Project.</Description>
+    <Identity Id="UniversalImageScaler.Peter Spada.7d4f0e00-00ae-49fa-bfe7-d3ffb5384d50" Version="1.0" Language="en-US" Publisher="Peter Spada" />
+    <DisplayName>Windows Universal App Image Scaler</DisplayName>
+    <Description xml:space="preserve">This is a Visual Studio extension that allows for easy logo image creation. It takes large source images and creates resized copies that are used for app logos and splash screens.</Description>
+    <MoreInfo>https://github.com/spadapet/universal-image-scaler</MoreInfo>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0]" />
