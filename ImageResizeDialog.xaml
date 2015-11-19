@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         Title="Image Resize"
         Width="400"
-        Height="300"
+        Height="400"
         ResizeMode="NoResize"
         Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}">
     <Grid>
@@ -19,9 +19,31 @@
         </Grid.RowDefinitions>
         <StackPanel Margin="5" Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Left">
             <TextBlock Text="{Binding FileName}" />
-            <Border BorderThickness="1" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}">
-                <Image Stretch="UniformToFill" Width="100" Height="100" Source="{Binding FullPath}" />
+            <Border
+                HorizontalAlignment="Left" 
+                Margin="0,5,0,0"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}">
+                <Image Stretch="Uniform" Width="100" Height="100" Source="{Binding FullPath}" />
             </Border>
+            <TextBlock Margin="0,5,0,0" Text="Choose images to generate." />
+            <TextBlock Margin="0,5,0,0">
+                <Run Text="Destination is " /><Run Text="{Binding FullDir, Mode=OneTime}" />
+            </TextBlock>
+            <ItemsControl Margin="0,5,0,0" ItemsSource="{Binding ManifestImages}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox IsChecked="{Binding Generate, Mode=TwoWay}" IsEnabled="{Binding Enabled}">
+                            <CheckBox.Content>
+                                <TextBlock>
+                                    <Run Text="{Binding Name, Mode=OneTime}" />
+                                    <Run Text="{Binding Width, Mode=OneTime}" /><Run Text="x" /><Run Text="{Binding Height, Mode=OneTime}" />
+                                </TextBlock>
+                            </CheckBox.Content>
+                        </CheckBox>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
         <Grid Grid.Row="1" Grid.IsSharedSizeScope="True" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>

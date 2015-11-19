@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
+using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace UniversalImageScaler
 {
-    internal class ImageResizeInfo // : INotifyPropertyChanged
+    internal class ImageResizeInfo : ModelBase
     {
         private VSITEMSELECTION item;
         private string path;
         private string dir;
+        private List<ManifestImageInfo> manifestImages;
+        private BitmapImage bitmap;
 
         public ImageResizeInfo(VSITEMSELECTION item)
         {
@@ -32,6 +34,33 @@ namespace UniversalImageScaler
             {
                 throw new ArgumentException("item must be an image");
             }
+
+            this.manifestImages = new List<ManifestImageInfo>()
+            {
+                new ManifestImageInfo("SmallTileLogo", 71, 71),
+                new ManifestImageInfo("MediumTileLogo", 150, 150),
+                new ManifestImageInfo("WideTileLogo", 310, 150),
+                new ManifestImageInfo("LargeTileLogo", 310, 310),
+                new ManifestImageInfo("AppListLogo", 44, 44, 256, 48, 24, 16),
+                new ManifestImageInfo("StoreLogo", 50, 50),
+                new ManifestImageInfo("BadgeLogo", 24, 24),
+                new ManifestImageInfo("SplashScreen", 620, 300),
+            };
+
+            this.bitmap = new BitmapImage(new Uri(this.path));
+
+            foreach (ManifestImageInfo info in this.manifestImages)
+            {
+                if (this.IsSquare && info.IsSquare)
+                {
+                    info.Generate = true;
+                }
+
+                if (this.IsWide && info.IsWide)
+                {
+                    info.Generate = true;
+                }
+            }
         }
 
         public string FullPath
@@ -50,18 +79,35 @@ namespace UniversalImageScaler
             }
         }
 
+        public string FullDir
+        {
+            get
+            {
+                return Path.GetDirectoryName(this.path);
+            }
+        }
+
         public IEnumerable<ManifestImageInfo> ManifestImages
         {
             get
             {
-                yield return new ManifestImageInfo(71, 71);
-                yield return new ManifestImageInfo(150, 150);
-                yield return new ManifestImageInfo(310, 150);
-                yield return new ManifestImageInfo(310, 310);
-                yield return new ManifestImageInfo(44, 44, 256, 48, 24, 16);
-                yield return new ManifestImageInfo(50, 50);
-                yield return new ManifestImageInfo(24, 24);
-                yield return new ManifestImageInfo(620, 300);
+                return this.manifestImages;
+            }
+        }
+
+        public bool IsSquare
+        {
+            get
+            {
+                return this.bitmap != null && this.bitmap.Width == this.bitmap.Height;
+            }
+        }
+
+        public bool IsWide
+        {
+            get
+            {
+                return this.bitmap != null && this.bitmap.Width > this.bitmap.Height;
             }
         }
     }

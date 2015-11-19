@@ -2,17 +2,22 @@
 
 namespace UniversalImageScaler
 {
-    internal class ManifestImageInfo
+    internal class ManifestImageInfo : ModelBase
     {
         private int width;
         private int height;
         private int[] targetSizes;
+        private string name;
+        private bool enabled;
+        private bool generate;
 
-        public ManifestImageInfo(int width, int height, params int[] targetSizes)
+        public ManifestImageInfo(string name, int width, int height, params int[] targetSizes)
         {
+            this.name = name;
             this.width = width;
             this.height = height;
             this.targetSizes = targetSizes ?? new int[0];
+            this.enabled = true;
         }
 
         public int Width
@@ -61,6 +66,11 @@ namespace UniversalImageScaler
             return (int)(this.height * scale);
         }
 
+        public string GetScaledFileName(double scale)
+        {
+            return $"{this.name}.scale-{(int)(scale * 100.0)}.png";
+        }
+
         public bool IsSquare
         {
             get
@@ -74,6 +84,48 @@ namespace UniversalImageScaler
             get
             {
                 return this.width != this.height;
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return this.name;
+            }
+        }
+
+        public bool Enabled
+        {
+            get
+            {
+                return this.enabled;
+            }
+
+            set
+            {
+                if (this.enabled != value)
+                {
+                    this.enabled = value;
+                    OnPropertyChanged(nameof(this.Enabled));
+                }
+            }
+        }
+
+        public bool Generate
+        {
+            get
+            {
+                return this.generate;
+            }
+
+            set
+            {
+                if (this.generate != value)
+                {
+                    this.generate = value;
+                    OnPropertyChanged(nameof(this.Generate));
+                }
             }
         }
     }
