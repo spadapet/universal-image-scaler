@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -9,9 +10,11 @@ namespace UniversalImageScaler
     internal class ImageResizeInfo : ModelBase
     {
         private VSITEMSELECTION item;
-        private string path;
+        private string name;
         private string dir;
-        private List<ManifestImageInfo> manifestImages;
+        private string path;
+        private double scale;
+        private List<ImageInfo> images;
         private BitmapImage bitmap;
 
         public ImageResizeInfo(VSITEMSELECTION item)
@@ -27,8 +30,19 @@ namespace UniversalImageScaler
             if (item.pHier.GetCanonicalName(item.itemid, out this.path) >= 0 &&
                 item.pHier.GetProperty(item.itemid, (int)__VSHPROPID.VSHPROPID_Name, out nameObj) >= 0)
             {
+                this.name = (string)nameObj;
                 this.dir = Path.GetDirectoryName(this.path);
-                this.path = Path.Combine(this.dir, (string)nameObj);
+                this.path = Path.Combine(this.dir, this.name);
+
+                Match match = Regex.Match(this.name, @".*\.scale-(?<scale>\d{3})\.(?:png|jpg)");
+                if (match != null && match.Success)
+                {
+                    int scale;
+                    if (int.TryParse(match.Groups["scale"].Value, out scale))
+                    {
+                        this.scale = scale / 100.0;
+                    }
+                }
             }
             else
             {
@@ -36,20 +50,27 @@ namespace UniversalImageScaler
             }
 
             this.bitmap = new BitmapImage(new Uri(this.path));
+            this.images = new List<ImageInfo>();
 
-            this.manifestImages = new List<ManifestImageInfo>()
+            if (this.scale == 0.0)
             {
-                new ManifestImageInfo("Small Tile Logo", 71, 71),
-                new ManifestImageInfo("Medium Tile Logo", 150, 150),
-                new ManifestImageInfo("Wide Tile Logo", 310, 150),
-                new ManifestImageInfo("Large Tile Logo", 310, 310),
-                new ManifestImageInfo("App List Logo", 44, 44, 256, 48, 24, 16),
-                new ManifestImageInfo("Store Logo", 50, 50),
-                new ManifestImageInfo("Badge Logo", 24, 24),
-                new ManifestImageInfo("Splash Screen", 620, 300),
-            };
+                this.images.Add(new ImageInfo(this, "Small Tile Logo", 71, 71));
+                this.images.Add(new ImageInfo(this, "Medium Tile Logo", 150, 150));
+                this.images.Add(new ImageInfo(this, "Wide Tile Logo", 310, 150));
+                this.images.Add(new ImageInfo(this, "Large Tile Logo", 310, 310));
+                this.images.Add(new ImageInfo(this, "App List Logo", 44, 44, 256, 48, 24, 16));
+                this.images.Add(new ImageInfo(this, "Store Logo", 50, 50));
+                this.images.Add(new ImageInfo(this, "Badge Logo", 24, 24));
+                this.images.Add(new ImageInfo(this, "Splash Screen", 620, 300));
+            }
+            else
+            {
+                this.images.Add(new ImageInfo(this, this.name,
+                    (int)(this.bitmap.Width / this.scale),
+                    (int)(this.bitmap.Height / this.scale)));
+            }
 
-            foreach (ManifestImageInfo info in this.manifestImages)
+            foreach (ImageInfo info in this.images)
             {
                 if (this.IsSquare && info.IsSquare)
                 {
@@ -67,6 +88,32 @@ namespace UniversalImageScaler
                     info.Enabled = false;
                 }
             }
+
+            this.images.RemoveAll(info => !info.Enabled);
+        }
+
+        public double Scale
+        {
+            get
+            {
+                return this.scale;
+            }
+        }
+
+        public string FileName
+        {
+            get
+            {
+                return this.name;
+            }
+        }
+
+        public string FullDir
+        {
+            get
+            {
+                return this.dir;
+            }
         }
 
         public string FullPath
@@ -77,27 +124,21 @@ namespace UniversalImageScaler
             }
         }
 
-        public string FileName
+        public IEnumerable<ImageInfo> Images
         {
             get
             {
-                return Path.GetFileName(this.path);
+                return this.images;
             }
         }
 
-        public string FullDir
+        public string HeaderText
         {
             get
             {
-                return Path.GetDirectoryName(this.path);
-            }
-        }
-
-        public IEnumerable<ManifestImageInfo> ManifestImages
-        {
-            get
-            {
-                return this.manifestImages;
+                return this.IsManifestImage
+                    ? "Select manifest images to generate:"
+                    : "Select smaller scales to generate:";
             }
         }
 
@@ -114,6 +155,14 @@ namespace UniversalImageScaler
             get
             {
                 return this.bitmap != null && this.bitmap.Width > this.bitmap.Height;
+            }
+        }
+
+        public bool IsManifestImage
+        {
+            get
+            {
+                return this.scale == 0.0;
             }
         }
     }

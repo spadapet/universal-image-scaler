@@ -12,47 +12,50 @@
         Width="450"
         Height="500"
         Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}">
+    <vsui:DialogWindow.Resources>
+        <Style TargetType="{x:Type HeaderedItemsControl}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type HeaderedItemsControl}">
+                        <StackPanel Orientation="Vertical">
+                            <ContentPresenter ContentSource="Header" />
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Border>
+                        </StackPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </vsui:DialogWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <StackPanel Margin="5" Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Left">
+        <StackPanel Margin="10" Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Left">
             <TextBlock Text="{Binding FileName}" />
             <Border
                 HorizontalAlignment="Left" 
                 Margin="0,5,0,0"
                 BorderThickness="1"
                 BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}">
-                <Image Stretch="Uniform" Width="100" Height="100" Source="{Binding FullPath}" />
+                <Image Stretch="Uniform" Width="150" Height="150" Source="{Binding FullPath}" />
             </Border>
-            <TextBlock Margin="0,5,0,0" Text="Choose images to generate." />
             <TextBlock Margin="0,5,0,0">
                 <Run Text="Destination is " /><Run Text="{Binding FullDir, Mode=OneTime}" />
             </TextBlock>
-            <ItemsControl Margin="0,5,0,0" ItemsSource="{Binding ManifestImages}">
-                <ItemsControl.ItemTemplate>
+            <HeaderedItemsControl Margin="0,5,0,0" ItemsSource="{Binding Images}" Header="{Binding HeaderText}">
+                <HeaderedItemsControl.ItemTemplate>
                     <DataTemplate>
                         <CheckBox IsChecked="{Binding Generate, Mode=TwoWay}" IsEnabled="{Binding Enabled}" Margin="0,5,0,0">
                             <CheckBox.Content>
-                                <TextBlock>
-                                    <Run Text="{Binding Name, Mode=OneTime}" />
-                                    <Run Text="{Binding Width, Mode=OneTime}" /><Run Text="x" /><Run Text="{Binding Height, Mode=OneTime}" />
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Style.Triggers>
-                                                <Trigger Property="IsEnabled" Value="False">
-                                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrush}}" />
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
+                                <TextBlock Text="{Binding DisplayText, Mode=OneTime}" />
                             </CheckBox.Content>
                         </CheckBox>
                     </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                </HeaderedItemsControl.ItemTemplate>
+            </HeaderedItemsControl>
         </StackPanel>
         <Grid Grid.Row="1" Grid.IsSharedSizeScope="True" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>

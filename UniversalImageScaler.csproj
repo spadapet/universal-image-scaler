@@ -75,7 +75,7 @@
     </Compile>
     <Compile Include="ImageResizeInfo.cs" />
     <Compile Include="ImageResizePackage.cs" />
-    <Compile Include="ManifestImageInfo.cs" />
+    <Compile Include="ImageInfo.cs" />
     <Compile Include="ModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
