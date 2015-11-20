@@ -7,10 +7,10 @@
         xmlns:local="clr-namespace:UniversalImageScaler"
         xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
         mc:Ignorable="d"
-        Title="Image Resize"
-        Width="400"
-        Height="400"
+        Title="Scaled image generator"
         ResizeMode="NoResize"
+        Width="450"
+        Height="500"
         Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}">
     <Grid>
         <Grid.RowDefinitions>
@@ -33,11 +33,20 @@
             <ItemsControl Margin="0,5,0,0" ItemsSource="{Binding ManifestImages}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <CheckBox IsChecked="{Binding Generate, Mode=TwoWay}" IsEnabled="{Binding Enabled}">
+                        <CheckBox IsChecked="{Binding Generate, Mode=TwoWay}" IsEnabled="{Binding Enabled}" Margin="0,5,0,0">
                             <CheckBox.Content>
                                 <TextBlock>
                                     <Run Text="{Binding Name, Mode=OneTime}" />
                                     <Run Text="{Binding Width, Mode=OneTime}" /><Run Text="x" /><Run Text="{Binding Height, Mode=OneTime}" />
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrush}}" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
                                 </TextBlock>
                             </CheckBox.Content>
                         </CheckBox>

@@ -35,19 +35,19 @@ namespace UniversalImageScaler
                 throw new ArgumentException("item must be an image");
             }
 
+            this.bitmap = new BitmapImage(new Uri(this.path));
+
             this.manifestImages = new List<ManifestImageInfo>()
             {
-                new ManifestImageInfo("SmallTileLogo", 71, 71),
-                new ManifestImageInfo("MediumTileLogo", 150, 150),
-                new ManifestImageInfo("WideTileLogo", 310, 150),
-                new ManifestImageInfo("LargeTileLogo", 310, 310),
-                new ManifestImageInfo("AppListLogo", 44, 44, 256, 48, 24, 16),
-                new ManifestImageInfo("StoreLogo", 50, 50),
-                new ManifestImageInfo("BadgeLogo", 24, 24),
-                new ManifestImageInfo("SplashScreen", 620, 300),
+                new ManifestImageInfo("Small Tile Logo", 71, 71),
+                new ManifestImageInfo("Medium Tile Logo", 150, 150),
+                new ManifestImageInfo("Wide Tile Logo", 310, 150),
+                new ManifestImageInfo("Large Tile Logo", 310, 310),
+                new ManifestImageInfo("App List Logo", 44, 44, 256, 48, 24, 16),
+                new ManifestImageInfo("Store Logo", 50, 50),
+                new ManifestImageInfo("Badge Logo", 24, 24),
+                new ManifestImageInfo("Splash Screen", 620, 300),
             };
-
-            this.bitmap = new BitmapImage(new Uri(this.path));
 
             foreach (ManifestImageInfo info in this.manifestImages)
             {
@@ -59,6 +59,12 @@ namespace UniversalImageScaler
                 if (this.IsWide && info.IsWide)
                 {
                     info.Generate = true;
+                }
+
+                if (this.IsSquare != info.IsSquare &&
+                    this.IsWide != info.IsWide)
+                {
+                    info.Enabled = false;
                 }
             }
         }

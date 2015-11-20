@@ -68,7 +68,7 @@ namespace UniversalImageScaler
 
         public string GetScaledFileName(double scale)
         {
-            return $"{this.name}.scale-{(int)(scale * 100.0)}.png";
+            return $"{this.name.Replace(" ", string.Empty)}.scale-{(int)(scale * 100.0)}.png";
         }
 
         public bool IsSquare
