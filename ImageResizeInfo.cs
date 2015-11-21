@@ -66,8 +66,8 @@ namespace UniversalImageScaler
             else
             {
                 this.images.Add(new ImageInfo(this, this.name,
-                    (int)(this.bitmap.Width / this.scale),
-                    (int)(this.bitmap.Height / this.scale)));
+                    (int)(this.bitmap.PixelWidth / this.scale),
+                    (int)(this.bitmap.PixelHeight / this.scale)));
             }
 
             foreach (ImageInfo info in this.images)
@@ -146,7 +146,7 @@ namespace UniversalImageScaler
         {
             get
             {
-                return this.bitmap != null && this.bitmap.Width == this.bitmap.Height;
+                return this.bitmap != null && this.bitmap.PixelWidth == this.bitmap.PixelHeight;
             }
         }
 
@@ -154,7 +154,7 @@ namespace UniversalImageScaler
         {
             get
             {
-                return this.bitmap != null && this.bitmap.Width > this.bitmap.Height;
+                return this.bitmap != null && this.bitmap.PixelWidth > this.bitmap.PixelHeight;
             }
         }
 
