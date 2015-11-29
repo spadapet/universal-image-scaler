@@ -1,6 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Design;
+using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.Shell.Interop;
 using OLECMDF = Microsoft.VisualStudio.OLE.Interop.OLECMDF;
 
@@ -23,20 +26,20 @@ namespace UniversalImageScaler
             VSITEMSELECTION sel = this.SelectedItem;
             if (sel.pHier != null)
             {
-                bool? result = null;
-
                 try
                 {
                     ImageResizeInfo item = new ImageResizeInfo(sel);
                     ImageResizeDialog dialog = new ImageResizeDialog(item);
-                    result = dialog.ShowModal();
-                }
-                catch (ArgumentException)
-                {
-                }
+                    bool? result = dialog.ShowModal();
 
-                if (result.HasValue && result.Value)
+                    if (result.HasValue && result.Value)
+                    {
+                        GenerateImages(item);
+                    }
+                }
+                catch (Exception ex)
                 {
+                    Debug.Fail(ex.Message);
                 }
             }
         }
@@ -122,6 +125,57 @@ namespace UniversalImageScaler
                 }
 
                 return sel;
+            }
+        }
+
+        private void GenerateImages(ImageResizeInfo item)
+        {
+            byte[] fileBytes = File.ReadAllBytes(item.FullPath);
+
+            foreach (ImageInfo image in item.Images)
+            {
+                if (image.Generate && image.Enabled)
+                {
+                    foreach (double scale in image.Scales)
+                    {
+                        BitmapImage bitmap = new BitmapImage();
+                        bitmap.BeginInit();
+                        bitmap.DecodePixelWidth = image.GetScaledWidth(scale);
+                        bitmap.DecodePixelHeight = image.GetScaledHeight(scale);
+                        bitmap.StreamSource = new MemoryStream(fileBytes);
+                        bitmap.EndInit();
+
+                        BitmapEncoder encoder = new PngBitmapEncoder();
+                        encoder.Frames.Add(BitmapFrame.Create(bitmap));
+
+                        MemoryStream streamOut = new MemoryStream();
+                        encoder.Save(streamOut);
+
+                        byte[] newFileBytes = streamOut.ToArray();
+                        string destPath = Path.Combine(item.FullDir, image.GetScaledFileName(scale));
+                        File.WriteAllBytes(destPath, newFileBytes);
+                    }
+
+                    foreach (double targetSize in image.TargetSizes)
+                    {
+                        BitmapImage bitmap = new BitmapImage();
+                        bitmap.BeginInit();
+                        bitmap.DecodePixelWidth = (int)targetSize;
+                        bitmap.DecodePixelHeight = (int)targetSize;
+                        bitmap.StreamSource = new MemoryStream(fileBytes);
+                        bitmap.EndInit();
+
+                        BitmapEncoder encoder = new PngBitmapEncoder();
+                        encoder.Frames.Add(BitmapFrame.Create(bitmap));
+
+                        MemoryStream streamOut = new MemoryStream();
+                        encoder.Save(streamOut);
+
+                        byte[] newFileBytes = streamOut.ToArray();
+                        string destPath = Path.Combine(item.FullDir, image.GetTargetSizeFileName(targetSize));
+                        File.WriteAllBytes(destPath, newFileBytes);
+                    }
+                }
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -96,17 +97,22 @@ namespace UniversalImageScaler
 
         public int GetScaledWidth(double scale)
         {
-            return (int)(this.width * scale);
+            return (int)Math.Ceiling(this.width * scale);
         }
 
         public int GetScaledHeight(double scale)
         {
-            return (int)(this.height * scale);
+            return (int)Math.Ceiling(this.height * scale);
         }
 
         public string GetScaledFileName(double scale)
         {
             return $"{this.FileName}.scale-{(int)(scale * 100.0)}{this.extension}";
+        }
+
+        public string GetTargetSizeFileName(double targetSize)
+        {
+            return $"{this.FileName}.targetsize-{(int)targetSize}{this.extension}";
         }
 
         public bool IsSquare

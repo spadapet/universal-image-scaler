@@ -92,6 +92,14 @@ namespace UniversalImageScaler
             this.images.RemoveAll(info => !info.Enabled);
         }
 
+        public BitmapImage Bitmap
+        {
+            get
+            {
+                return this.bitmap;
+            }
+        }
+
         public double Scale
         {
             get
