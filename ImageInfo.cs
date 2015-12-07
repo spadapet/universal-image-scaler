@@ -62,7 +62,11 @@ namespace UniversalImageScaler
             {
                 foreach (double scale in this.InternalScales)
                 {
-                    if (this.owner.IsManifestImage || scale < this.owner.Scale)
+                    int width = this.GetScaledWidth(scale);
+                    int height = this.GetScaledHeight(scale);
+
+                    if (width <= this.owner.Bitmap.PixelWidth &&
+                        height <= this.owner.Bitmap.PixelHeight)
                     {
                         yield return scale;
                     }
@@ -91,7 +95,14 @@ namespace UniversalImageScaler
         {
             get
             {
-                return this.targetSizes;
+                foreach (int targetSize in this.targetSizes)
+                {
+                    if (targetSize <= owner.Bitmap.PixelWidth &&
+                        targetSize <= owner.Bitmap.PixelHeight)
+                    {
+                        yield return targetSize;
+                    }
+                }
             }
         }
 
@@ -113,6 +124,11 @@ namespace UniversalImageScaler
         public string GetTargetSizeFileName(double targetSize)
         {
             return $"{this.FileName}.targetsize-{(int)targetSize}{this.extension}";
+        }
+
+        public string GetUnplatedTargetSizeFileName(double targetSize)
+        {
+            return $"{this.FileName}.targetsize-{(int)targetSize}_altform-unplated{this.extension}";
         }
 
         public bool IsSquare
@@ -146,7 +162,7 @@ namespace UniversalImageScaler
                     sb.Append((int)(scale * 100));
                 }
 
-                return $"{this.name}{this.extension}, {this.width}x{this.height}, Scales:{sb.ToString()}";
+                return $"{this.name}{this.extension}, Scales:{sb.ToString()}";
             }
         }
 

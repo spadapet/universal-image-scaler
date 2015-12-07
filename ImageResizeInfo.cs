@@ -54,11 +54,11 @@ namespace UniversalImageScaler
 
             if (this.scale == 0.0)
             {
-                this.images.Add(new ImageInfo(this, "Small Tile Logo", 71, 71));
-                this.images.Add(new ImageInfo(this, "Medium Tile Logo", 150, 150));
-                this.images.Add(new ImageInfo(this, "Wide Tile Logo", 310, 150));
-                this.images.Add(new ImageInfo(this, "Large Tile Logo", 310, 310));
-                this.images.Add(new ImageInfo(this, "App List Logo", 44, 44, 256, 48, 24, 16));
+                this.images.Add(new ImageInfo(this, "Square 71x71 Logo", 71, 71));
+                this.images.Add(new ImageInfo(this, "Square 150x150 Logo", 150, 150));
+                this.images.Add(new ImageInfo(this, "Wide 310x150 Logo", 310, 150));
+                this.images.Add(new ImageInfo(this, "Square 310x310 Logo", 310, 310));
+                this.images.Add(new ImageInfo(this, "Square 44x44 Logo", 44, 44, 256, 48, 24, 16));
                 this.images.Add(new ImageInfo(this, "Store Logo", 50, 50));
                 this.images.Add(new ImageInfo(this, "Badge Logo", 24, 24));
                 this.images.Add(new ImageInfo(this, "Splash Screen", 620, 300));

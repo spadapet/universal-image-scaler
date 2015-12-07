@@ -3,6 +3,8 @@ using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.Shell.Interop;
 using OLECMDF = Microsoft.VisualStudio.OLE.Interop.OLECMDF;
@@ -139,14 +141,39 @@ namespace UniversalImageScaler
                     foreach (double scale in image.Scales)
                     {
                         BitmapImage bitmap = new BitmapImage();
+                        BitmapSource bitmapSource = bitmap;
                         bitmap.BeginInit();
                         bitmap.DecodePixelWidth = image.GetScaledWidth(scale);
                         bitmap.DecodePixelHeight = image.GetScaledHeight(scale);
                         bitmap.StreamSource = new MemoryStream(fileBytes);
                         bitmap.EndInit();
 
+                        if (image.Name.StartsWith("Badge"))
+                        {
+                            FormatConvertedBitmap cb = new FormatConvertedBitmap(bitmap, PixelFormats.Bgra32, null, 0);
+                            WriteableBitmap wb = new WriteableBitmap(bitmap);
+                            byte[] pixels = new byte[wb.PixelWidth * wb.PixelHeight * 4];
+                            wb.CopyPixels(pixels, wb.PixelWidth * 4, 0);
+
+                            for (int y = 0; y < wb.PixelHeight; y++)
+                            {
+                                for (int x = 0; x < wb.PixelWidth; x++)
+                                {
+                                    int start = y * wb.PixelWidth * 4 + x * 4;
+                                    byte val = (pixels[start + 3] > 127) ? (byte)255 : (byte)0;
+                                    pixels[start + 0] = val;
+                                    pixels[start + 1] = val;
+                                    pixels[start + 2] = val;
+                                    pixels[start + 3] = val;
+                                }
+                            }
+
+                            wb.WritePixels(new Int32Rect(0, 0, wb.PixelWidth, wb.PixelHeight), pixels, wb.PixelWidth * 4, 0);
+                            bitmapSource = wb;
+                        }
+
                         BitmapEncoder encoder = new PngBitmapEncoder();
-                        encoder.Frames.Add(BitmapFrame.Create(bitmap));
+                        encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
 
                         MemoryStream streamOut = new MemoryStream();
                         encoder.Save(streamOut);
@@ -174,6 +201,7 @@ namespace UniversalImageScaler
                         byte[] newFileBytes = streamOut.ToArray();
                         string destPath = Path.Combine(item.FullDir, image.GetTargetSizeFileName(targetSize));
                         File.WriteAllBytes(destPath, newFileBytes);
+                        File.Copy(destPath, image.GetUnplatedTargetSizeFileName(targetSize));
                     }
                 }
             }
