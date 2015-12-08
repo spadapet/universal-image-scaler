@@ -16,6 +16,8 @@ namespace UniversalImageScaler
         private double scale;
         private List<ImageInfo> images;
         private BitmapImage bitmap;
+        private int pixelWidth;
+        private int pixelHeight;
 
         public ImageResizeInfo(VSITEMSELECTION item)
         {
@@ -50,6 +52,8 @@ namespace UniversalImageScaler
             }
 
             this.bitmap = new BitmapImage(new Uri(this.path));
+            this.pixelWidth = this.bitmap.PixelWidth;
+            this.pixelHeight = this.bitmap.PixelHeight;
             this.images = new List<ImageInfo>();
 
             if (this.scale == 0.0)
@@ -66,8 +70,8 @@ namespace UniversalImageScaler
             else
             {
                 this.images.Add(new ImageInfo(this, this.name,
-                    (int)(this.bitmap.PixelWidth / this.scale),
-                    (int)(this.bitmap.PixelHeight / this.scale)));
+                    (int)(this.pixelWidth / this.scale),
+                    (int)(this.pixelHeight / this.scale)));
             }
 
             foreach (ImageInfo info in this.images)
@@ -92,12 +96,14 @@ namespace UniversalImageScaler
             this.images.RemoveAll(info => !info.Enabled);
         }
 
-        public BitmapImage Bitmap
+        public int PixelWidth
         {
-            get
-            {
-                return this.bitmap;
-            }
+            get { return this.pixelWidth; }
+        }
+
+        public int PixelHeight
+        {
+            get { return this.pixelHeight; }
         }
 
         public double Scale
@@ -154,7 +160,7 @@ namespace UniversalImageScaler
         {
             get
             {
-                return this.bitmap != null && this.bitmap.PixelWidth == this.bitmap.PixelHeight;
+                return this.bitmap != null && this.pixelWidth == this.pixelHeight;
             }
         }
 
@@ -162,7 +168,7 @@ namespace UniversalImageScaler
         {
             get
             {
-                return this.bitmap != null && this.bitmap.PixelWidth > this.bitmap.PixelHeight;
+                return this.bitmap != null && this.pixelWidth > this.pixelHeight;
             }
         }
 

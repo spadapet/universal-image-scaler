@@ -1,13 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using OLECMDF = Microsoft.VisualStudio.OLE.Interop.OLECMDF;
+using Task = System.Threading.Tasks.Task;
 
 namespace UniversalImageScaler
 {
@@ -15,15 +20,17 @@ namespace UniversalImageScaler
     {
         private IServiceProvider serviceProvider;
         private IVsMonitorSelection monitorSelection;
+        private ThreadHelper mainThreadHelper;
 
         public ImageResizeCommand(IServiceProvider serviceProvider, CommandID commandId)
             : base(null, commandId)
         {
             this.serviceProvider = serviceProvider;
             this.monitorSelection = serviceProvider.GetService(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
+            this.mainThreadHelper = ThreadHelper.Generic;
         }
 
-        public override void Invoke()
+        public override async void Invoke()
         {
             VSITEMSELECTION sel = this.SelectedItem;
             if (sel.pHier != null)
@@ -36,7 +43,7 @@ namespace UniversalImageScaler
 
                     if (result.HasValue && result.Value)
                     {
-                        GenerateImages(item);
+                        await GenerateImagesMainThread(sel, item);
                     }
                 }
                 catch (Exception ex)
@@ -116,7 +123,7 @@ namespace UniversalImageScaler
                         string name = (string)nameObj;
                         if (!string.IsNullOrEmpty(name))
                         {
-                            isImage = name.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
+                            isImage = name.EndsWith(".png");
                         }
                     }
                 }
@@ -130,16 +137,47 @@ namespace UniversalImageScaler
             }
         }
 
-        private void GenerateImages(ImageResizeInfo item)
+        private async Task GenerateImagesMainThread(VSITEMSELECTION sel, ImageResizeInfo item)
+        {
+            CommonMessagePump pump = new CommonMessagePump();
+            pump.AllowCancel = true;
+            pump.WaitTitle = "Creating scaled images";
+            pump.WaitText = "Adding to the project takes time...";
+
+            CancellationTokenSource tokenSource = new CancellationTokenSource();
+            CancellationToken token = tokenSource.Token;
+
+            Task task = Task.Run(() =>
+            {
+                foreach (string file in this.GenerateImages(sel, item, token))
+                {
+                    pump.WaitText = $"Adding to the project:\r\n{file}";
+                    OnGeneratedImage(sel, file);
+                }
+            }, token);
+
+            CommonMessagePumpExitCode code = pump.ModalWaitForHandles(((IAsyncResult)task).AsyncWaitHandle);
+            tokenSource.Cancel();
+            await task;
+        }
+
+        private IEnumerable<string> GenerateImages(VSITEMSELECTION sel, ImageResizeInfo item, CancellationToken token)
         {
             byte[] fileBytes = File.ReadAllBytes(item.FullPath);
 
             foreach (ImageInfo image in item.Images)
             {
+                OnBeforeGenerateImages(sel, item, image);
+
                 if (image.Generate && image.Enabled)
                 {
                     foreach (double scale in image.Scales)
                     {
+                        if (token.IsCancellationRequested)
+                        {
+                            yield break;
+                        }
+
                         BitmapImage bitmap = new BitmapImage();
                         BitmapSource bitmapSource = bitmap;
                         bitmap.BeginInit();
@@ -181,10 +219,16 @@ namespace UniversalImageScaler
                         byte[] newFileBytes = streamOut.ToArray();
                         string destPath = Path.Combine(item.FullDir, image.GetScaledFileName(scale));
                         File.WriteAllBytes(destPath, newFileBytes);
+                        yield return destPath;
                     }
 
                     foreach (double targetSize in image.TargetSizes)
                     {
+                        if (token.IsCancellationRequested)
+                        {
+                            yield break;
+                        }
+
                         BitmapImage bitmap = new BitmapImage();
                         bitmap.BeginInit();
                         bitmap.DecodePixelWidth = (int)targetSize;
@@ -201,10 +245,57 @@ namespace UniversalImageScaler
                         byte[] newFileBytes = streamOut.ToArray();
                         string destPath = Path.Combine(item.FullDir, image.GetTargetSizeFileName(targetSize));
                         File.WriteAllBytes(destPath, newFileBytes);
-                        File.Copy(destPath, image.GetUnplatedTargetSizeFileName(targetSize));
+                        yield return destPath;
+
+                        string unplatedPath = Path.Combine(item.FullDir, image.GetUnplatedTargetSizeFileName(targetSize));
+                        File.Copy(destPath, unplatedPath, true);
+                        yield return unplatedPath;
                     }
                 }
             }
+        }
+
+        private void OnBeforeGenerateImages(VSITEMSELECTION sel, ImageResizeInfo item, ImageInfo image)
+        {
+            // Remove existing images
+
+            this.mainThreadHelper.Invoke(() =>
+            {
+                string file = Path.Combine(item.FullDir, image.FileNameAndExtension);
+                EnvDTE.Project dteProject = this.GetProject(sel.pHier);
+                EnvDTE.ProjectItem dteItem = this.FindProjectItem(file);
+                if (dteItem != null)
+                {
+                    dteItem.Delete();
+                }
+            });
+        }
+
+        private void OnGeneratedImage(VSITEMSELECTION sel, string file)
+        {
+            // Add the new image to the project
+
+            this.mainThreadHelper.Invoke(() =>
+            {
+                EnvDTE.Project dteProject = this.GetProject(sel.pHier);
+                if (this.FindProjectItem(file) == null)
+                {
+                    dteProject.ProjectItems.AddFromFile(file);
+                }
+            });
+        }
+
+        private EnvDTE.ProjectItem FindProjectItem(string file)
+        {
+            EnvDTE.DTE dte = this.serviceProvider.GetService(typeof(SDTE)) as EnvDTE.DTE;
+            return dte.Solution.FindProjectItem(file);
+        }
+
+        private EnvDTE.Project GetProject(IVsHierarchy hierarchy)
+        {
+            object extObj;
+            hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out extObj);
+            return extObj as EnvDTE.Project;
         }
     }
 }

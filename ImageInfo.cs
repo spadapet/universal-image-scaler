@@ -65,8 +65,8 @@ namespace UniversalImageScaler
                     int width = this.GetScaledWidth(scale);
                     int height = this.GetScaledHeight(scale);
 
-                    if (width <= this.owner.Bitmap.PixelWidth &&
-                        height <= this.owner.Bitmap.PixelHeight)
+                    if (width < this.owner.PixelWidth &&
+                        height < this.owner.PixelHeight)
                     {
                         yield return scale;
                     }
@@ -97,8 +97,8 @@ namespace UniversalImageScaler
             {
                 foreach (int targetSize in this.targetSizes)
                 {
-                    if (targetSize <= owner.Bitmap.PixelWidth &&
-                        targetSize <= owner.Bitmap.PixelHeight)
+                    if (targetSize <= owner.PixelWidth &&
+                        targetSize <= owner.PixelHeight)
                     {
                         yield return targetSize;
                     }
@@ -179,6 +179,14 @@ namespace UniversalImageScaler
             get
             {
                 return this.owner.IsManifestImage ? this.name.Replace(" ", string.Empty) : this.name;
+            }
+        }
+
+        public virtual string FileNameAndExtension
+        {
+            get
+            {
+                return $"{this.FileName}{this.extension}";
             }
         }
 
