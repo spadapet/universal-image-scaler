@@ -3,7 +3,7 @@
   <Metadata>
     <Identity Id="UniversalImageScaler.Peter Spada.7d4f0e00-00ae-49fa-bfe7-d3ffb5384d50" Version="1.0" Language="en-US" Publisher="Peter Spada" />
     <DisplayName>Windows Universal App Image Scaler</DisplayName>
-    <Description xml:space="preserve">This is a Visual Studio extension that allows for easy logo image creation. It takes large source images and creates resized copies that are used for app logos and splash screens.</Description>
+    <Description xml:space="preserve">This is a Visual Studio extension that allows for easy logo image creation. It takes large source images (square and wide) and creates resized copies that are used for app logos and splash screens in Windows Universal Apps. Right click on a PNG file to access the feature.</Description>
     <MoreInfo>https://github.com/spadapet/universal-image-scaler</MoreInfo>
   </Metadata>
   <Installation>
