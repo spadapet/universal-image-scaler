@@ -65,8 +65,8 @@ namespace UniversalImageScaler
                     int width = this.GetScaledWidth(scale);
                     int height = this.GetScaledHeight(scale);
 
-                    if (width < this.owner.PixelWidth &&
-                        height < this.owner.PixelHeight)
+                    if (width <= this.owner.PixelWidth &&
+                        height <= this.owner.PixelHeight)
                     {
                         yield return scale;
                     }

@@ -213,13 +213,18 @@ namespace UniversalImageScaler
                         BitmapEncoder encoder = new PngBitmapEncoder();
                         encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
 
-                        MemoryStream streamOut = new MemoryStream();
-                        encoder.Save(streamOut);
+                        using (MemoryStream streamOut = new MemoryStream())
+                        {
+                            encoder.Save(streamOut);
 
-                        byte[] newFileBytes = streamOut.ToArray();
-                        string destPath = Path.Combine(item.FullDir, image.GetScaledFileName(scale));
-                        File.WriteAllBytes(destPath, newFileBytes);
-                        yield return destPath;
+                            byte[] newFileBytes = streamOut.ToArray();
+                            string destPath = Path.Combine(item.FullDir, image.GetScaledFileName(scale));
+                            if (!string.Equals(item.FullPath, destPath, StringComparison.OrdinalIgnoreCase))
+                            {
+                                File.WriteAllBytes(destPath, newFileBytes);
+                                yield return destPath;
+                            }
+                        }
                     }
 
                     foreach (double targetSize in image.TargetSizes)
@@ -239,17 +244,25 @@ namespace UniversalImageScaler
                         BitmapEncoder encoder = new PngBitmapEncoder();
                         encoder.Frames.Add(BitmapFrame.Create(bitmap));
 
-                        MemoryStream streamOut = new MemoryStream();
-                        encoder.Save(streamOut);
+                        using (MemoryStream streamOut = new MemoryStream())
+                        {
+                            encoder.Save(streamOut);
 
-                        byte[] newFileBytes = streamOut.ToArray();
-                        string destPath = Path.Combine(item.FullDir, image.GetTargetSizeFileName(targetSize));
-                        File.WriteAllBytes(destPath, newFileBytes);
-                        yield return destPath;
+                            byte[] newFileBytes = streamOut.ToArray();
+                            string destPath = Path.Combine(item.FullDir, image.GetTargetSizeFileName(targetSize));
+                            if (!string.Equals(item.FullPath, destPath, StringComparison.OrdinalIgnoreCase))
+                            {
+                                File.WriteAllBytes(destPath, newFileBytes);
+                                yield return destPath;
+                            }
 
-                        string unplatedPath = Path.Combine(item.FullDir, image.GetUnplatedTargetSizeFileName(targetSize));
-                        File.Copy(destPath, unplatedPath, true);
-                        yield return unplatedPath;
+                            string unplatedPath = Path.Combine(item.FullDir, image.GetUnplatedTargetSizeFileName(targetSize));
+                            if (!string.Equals(item.FullPath, unplatedPath, StringComparison.OrdinalIgnoreCase))
+                            {
+                                File.Copy(destPath, unplatedPath, true);
+                                yield return unplatedPath;
+                            }
+                        }
                     }
                 }
             }
@@ -266,7 +279,13 @@ namespace UniversalImageScaler
                 EnvDTE.ProjectItem dteItem = this.FindProjectItem(file);
                 if (dteItem != null)
                 {
-                    dteItem.Delete();
+                    try
+                    {
+                        dteItem.Remove();
+                    }
+                    catch
+                    {
+                    }
                 }
             });
         }
@@ -280,7 +299,13 @@ namespace UniversalImageScaler
                 EnvDTE.Project dteProject = this.GetProject(sel.pHier);
                 if (this.FindProjectItem(file) == null)
                 {
-                    dteProject.ProjectItems.AddFromFile(file);
+                    try
+                    {
+                        dteProject.ProjectItems.AddFromFile(file);
+                    }
+                    catch
+                    {
+                    }
                 }
             });
         }
