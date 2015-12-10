@@ -65,7 +65,7 @@ namespace UniversalImageScaler
                 this.images.Add(new ImageInfo(this, "Square 310x310 Logo", 310, 310));
                 this.images.Add(new ImageInfo(this, "Square 44x44 Logo", 44, 44, 256, 48, 24, 16));
                 this.images.Add(new ImageInfo(this, "Store Logo", 50, 50));
-                this.images.Add(new ImageInfo(this, "Badge Logo", 24, 24));
+                this.images.Add(new ImageInfo(this, "Badge Logo", 24, 24) { TransformType = ImageTransformType.WhiteOnly });
                 this.images.Add(new ImageInfo(this, "Splash Screen", 620, 300));
             }
             else

@@ -55,6 +55,7 @@
     <Compile Include="ImageResizeInfo.cs" />
     <Compile Include="ImageResizePackage.cs" />
     <Compile Include="ImageInfo.cs" />
+    <Compile Include="Utility\DteHelpers.cs" />
     <Compile Include="Utility\ImageHelpers.cs" />
     <Compile Include="Utility\ModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

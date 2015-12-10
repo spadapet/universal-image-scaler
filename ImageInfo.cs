@@ -41,6 +41,11 @@ namespace UniversalImageScaler
             }
         }
 
+        public ImageTransformType TransformType
+        {
+            get; set;
+        }
+
         public int Width
         {
             get
