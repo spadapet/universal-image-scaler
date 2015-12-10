@@ -18,7 +18,6 @@ namespace UniversalImageScaler
         private const string CommandSetGuidString = "d4e44266-2d61-4268-ac51-b3392512cbbf"; 
         private const int ImageResizeCommandId = 1;
 
-
         private List<MenuCommand> menuCommands;
         private IMenuCommandService menuCommandService;
 
@@ -43,17 +42,16 @@ namespace UniversalImageScaler
 
             base.Dispose(disposing);
         }
+
         private void AddMenuCommands()
         {
             if (this.menuCommandService == null)
             {
                 this.menuCommandService = this.GetService(typeof(IMenuCommandService)) as IMenuCommandService;
 
-
                 if (this.menuCommandService != null)
                 {
                     this.menuCommands.AddRange(this.CreateMenuCommands());
-
 
                     foreach (MenuCommand menuCommand in this.menuCommands)
                     {
@@ -62,7 +60,6 @@ namespace UniversalImageScaler
                 }
             }
         }
-
 
         private void RemoveMenuCommands()
         {
@@ -73,12 +70,10 @@ namespace UniversalImageScaler
                     this.menuCommandService.RemoveCommand(menuCommand);
                 }
 
-
                 this.menuCommands.Clear();
                 this.menuCommandService = null;
             }
         }
-
 
         private IEnumerable<MenuCommand> CreateMenuCommands()
         {

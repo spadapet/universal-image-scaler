@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace UniversalImageScaler
+namespace UniversalImageScaler.Utility
 {
     internal class ModelBase : INotifyPropertyChanged
     {

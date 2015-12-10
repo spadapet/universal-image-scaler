@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+
+  <Commands package="guidImageResizePackage">
+    <Buttons>
+      <Button guid="guidImageResizePackageCmdSet" id="cmdidImageResize" priority="0x0100" type="Button">
+        <Icon guid="guidImages" id="bmpPic1" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <ButtonText>Scale image for Universal App...</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+
+    <Bitmaps>
+      <Bitmap guid="guidImages" href="ImageResize.png" usedList="bmpPic1" />
+    </Bitmaps>
+  </Commands>
+
+  <CommandPlacements>
+    <CommandPlacement guid="guidImageResizePackageCmdSet" id="cmdidImageResize" priority="0x1000">
+      <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_ITEM_OPEN" />
+    </CommandPlacement>
+  </CommandPlacements>
+
+  <Symbols>
+    <GuidSymbol name="guidImageResizePackage" value="{9bd56ba2-ecfa-4ff8-8615-0475808ff596}" />
+
+    <GuidSymbol name="guidImageResizePackageCmdSet" value="{d4e44266-2d61-4268-ac51-b3392512cbbf}">
+      <IDSymbol name="cmdidImageResize" value="1" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidImages" value="{561b0328-6477-4fdd-9add-de9be4e55b8c}" >
+      <IDSymbol name="bmpPic1" value="1" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>

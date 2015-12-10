@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.Shell.Interop;
+using UniversalImageScaler.Utility;
 
 namespace UniversalImageScaler
 {
