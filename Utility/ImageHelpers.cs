@@ -38,17 +38,40 @@ namespace UniversalImageScaler.Utility
             return isImage;
         }
 
-        public static BitmapSource ScaleSourceImage(byte[] sourceBytes, int width, int height)
+        public static BitmapSource LoadSourceImage(string path)
         {
             BitmapImage bitmap = new BitmapImage();
             bitmap.BeginInit();
-            bitmap.StreamSource = new MemoryStream(sourceBytes);
+            bitmap.UriSource = new Uri(path);
             bitmap.CacheOption = BitmapCacheOption.OnLoad;
             bitmap.EndInit();
 
-            BitmapSource source = bitmap;
+            return bitmap;
+        }
 
-            // source = new TransformedBitmap(source, new ScaleTransform(...));
+        public static BitmapSource ScaleSourceImage(BitmapSource source, double width, double height)
+        {
+            if (source.Format != PixelFormats.Bgra32)
+            {
+                source = new FormatConvertedBitmap(source, PixelFormats.Bgra32, null, 0);
+            }
+
+            double sourceWidth = source.PixelWidth;
+            double sourceHeight = source.PixelHeight;
+            double scale = Math.Min(width / sourceWidth, height / sourceHeight);
+
+            if (scale != 1.0)
+            {
+                source = new TransformedBitmap(source, new ScaleTransform(scale, scale));
+                sourceWidth = source.PixelWidth;
+                sourceHeight = source.PixelHeight;
+            }
+
+            if (sourceWidth != width || sourceHeight != height)
+            {
+                WriteableBitmap newSource = new WriteableBitmap((int)width, (int)height, source.DpiX, source.DpiY, PixelFormats.Bgra32, null);
+                // ...
+            }
 
             return source;
         }

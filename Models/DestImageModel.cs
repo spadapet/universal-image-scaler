@@ -68,8 +68,8 @@ namespace UniversalImageScaler.Models
             {
                 foreach (double scale in this.InternalScales)
                 {
-                    int width = this.GetScaledWidth(scale);
-                    int height = this.GetScaledHeight(scale);
+                    double width = this.GetScaledWidth(scale);
+                    double height = this.GetScaledHeight(scale);
 
                     if (width <= this.owner.PixelWidth &&
                         height <= this.owner.PixelHeight)
@@ -112,14 +112,14 @@ namespace UniversalImageScaler.Models
             }
         }
 
-        public int GetScaledWidth(double scale)
+        public double GetScaledWidth(double scale)
         {
-            return (int)Math.Ceiling(this.width * scale);
+            return Math.Ceiling(this.width * scale);
         }
 
-        public int GetScaledHeight(double scale)
+        public double GetScaledHeight(double scale)
         {
-            return (int)Math.Ceiling(this.height * scale);
+            return Math.Ceiling(this.height * scale);
         }
 
         public string GetScaledFileName(double scale)

@@ -113,7 +113,7 @@ namespace UniversalImageScaler
                             if (!string.Equals(item.FullPath, destPath, StringComparison.OrdinalIgnoreCase))
                             {
                                 BitmapSource source = ImageHelpers.ScaleSourceImage(
-                                    fileBytes, image.GetScaledWidth(scale), image.GetScaledHeight(scale));
+                                    item.Bitmap, image.GetScaledWidth(scale), image.GetScaledHeight(scale));
                                 source = ImageHelpers.TransformImage(source, image.TransformType);
                                 ImageHelpers.SavePng(source, destPath);
                                 yield return destPath;

@@ -17,8 +17,8 @@ namespace UniversalImageScaler.Models
         private double scale;
         private List<DestImageModel> images;
         private BitmapImage bitmap;
-        private int pixelWidth;
-        private int pixelHeight;
+        private double pixelWidth;
+        private double pixelHeight;
 
         public SourceImageModel(VSITEMSELECTION item)
         {
@@ -52,7 +52,7 @@ namespace UniversalImageScaler.Models
                 throw new ArgumentException("item must be an image");
             }
 
-            this.bitmap = new BitmapImage(new Uri(this.path));
+            this.bitmap = ImageHelpers.LoadSourceImage(this.path);
             this.pixelWidth = this.bitmap.PixelWidth;
             this.pixelHeight = this.bitmap.PixelHeight;
             this.images = new List<DestImageModel>();
@@ -97,12 +97,17 @@ namespace UniversalImageScaler.Models
             this.images.RemoveAll(info => !info.Enabled);
         }
 
-        public int PixelWidth
+        public BitmapImage Bitmap
+        {
+            get { return this.bitmap; }
+        }
+
+        public double PixelWidth
         {
             get { return this.pixelWidth; }
         }
 
-        public int PixelHeight
+        public double PixelHeight
         {
             get { return this.pixelHeight; }
         }
