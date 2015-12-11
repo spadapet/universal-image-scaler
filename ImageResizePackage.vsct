@@ -17,7 +17,7 @@
     </Buttons>
 
     <Bitmaps>
-      <Bitmap guid="guidImages" href="ImageResize.png" usedList="bmpPic1" />
+      <Bitmap guid="guidImages" href="Resources\ImageResize.png" usedList="bmpPic1" />
     </Bitmaps>
   </Commands>
 

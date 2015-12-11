@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Microsoft.VisualStudio.Shell;
 
 namespace UniversalImageScaler.Utility
 {
@@ -12,33 +13,74 @@ namespace UniversalImageScaler.Utility
         WhiteOnly,
     }
 
+    internal enum ImageFileType
+    {
+        None,
+        Png,
+        Jpeg,
+        Pdf,
+        Svg,
+    }
+
     internal static class ImageHelpers
     {
-        public static bool IsSourceImageName(string name)
+        public static ImageFileType GetFileType(string name)
         {
-            bool isImage = false;
-
             if (!string.IsNullOrEmpty(name))
             {
-                isImage = name.EndsWith(".png");
+                if (name.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+                {
+                    return ImageFileType.Png;
+                }
+
+                if (name.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
+                    name.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase))
+                {
+                    return ImageFileType.Jpeg;
+                }
+
+                if (name.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                {
+                    return ImageFileType.Pdf;
+                }
+
+                if (name.EndsWith(".svg", StringComparison.OrdinalIgnoreCase))
+                {
+                    return ImageFileType.Svg;
+                }
             }
 
-            return isImage;
+            return ImageFileType.None;
+        }
+
+        public static bool IsSourceImageType(ImageFileType type)
+        {
+            switch (type)
+            {
+                case ImageFileType.Png:
+                case ImageFileType.Jpeg:
+                    return true;
+
+                default:
+                    return false;
+            }
         }
 
         public static bool IsSourceImageFile(string path)
         {
             bool isImage = false;
 
-            if (!string.IsNullOrEmpty(path) && File.Exists(path))
+            if (!string.IsNullOrEmpty(path))
             {
-                isImage = ImageHelpers.IsSourceImageName(Path.GetFileName(path));
+                string name = Path.GetFileName(path);
+                ImageFileType type = ImageHelpers.GetFileType(name);
+                isImage = ImageHelpers.IsSourceImageType(type);
             }
 
             return isImage;
         }
 
-        public static BitmapSource LoadSourceImage(string path)
+        public static BitmapImage LoadSourceImage(string path)
         {
             BitmapImage bitmap = new BitmapImage();
             bitmap.BeginInit();
@@ -47,6 +89,14 @@ namespace UniversalImageScaler.Utility
             bitmap.EndInit();
 
             return bitmap;
+        }
+
+        public static BitmapSource GetSourceForCurrentThread(ThreadHelper threadHelper, BitmapSource source)
+        {
+            return threadHelper.Invoke(() =>
+            {
+                return source.Clone();
+            });
         }
 
         public static BitmapSource ScaleSourceImage(BitmapSource source, double width, double height)
@@ -67,18 +117,42 @@ namespace UniversalImageScaler.Utility
                 sourceHeight = source.PixelHeight;
             }
 
+            // Center the scaled image
             if (sourceWidth != width || sourceHeight != height)
             {
-                WriteableBitmap newSource = new WriteableBitmap((int)width, (int)height, source.DpiX, source.DpiY, PixelFormats.Bgra32, null);
-                // ...
+                int pixelWidth = (int)width;
+                int pixelHeight = (int)height;
+                WriteableBitmap newSource = new WriteableBitmap(pixelWidth, pixelHeight, source.DpiX, source.DpiY, PixelFormats.Bgra32, null);
+                byte[] bytes = new byte[pixelWidth * pixelHeight * 4];
+
+                int destX = (int)(width / 2 - sourceWidth / 2);
+                int destY = (int)(height / 2 - sourceHeight / 2);
+                source.CopyPixels(bytes, pixelWidth * 4, destY * pixelWidth * 4 + destX * 4);
+                newSource.WritePixels(new Int32Rect(0, 0, pixelWidth, pixelHeight), bytes, pixelWidth * 4, 0);
+
+                source = newSource;
+                sourceWidth = source.PixelWidth;
+                sourceHeight = source.PixelHeight;
             }
 
             return source;
         }
 
-        public static void SavePng(BitmapSource source, string path)
+        public static void Save(BitmapSource source, ImageFileType type, string path)
         {
-            ImageHelpers.Save<PngBitmapEncoder>(source, path);
+            switch (type)
+            {
+                case ImageFileType.Png:
+                    ImageHelpers.Save<PngBitmapEncoder>(source, path);
+                    break;
+
+                case ImageFileType.Jpeg:
+                    ImageHelpers.Save<JpegBitmapEncoder>(source, path);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type));
+            }
         }
 
         private static void Save<EncoderT>(BitmapSource source, string path) where EncoderT : BitmapEncoder, new()

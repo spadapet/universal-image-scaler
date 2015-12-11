@@ -3,12 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using UniversalImageScaler.Models;
@@ -113,9 +109,9 @@ namespace UniversalImageScaler
                             if (!string.Equals(item.FullPath, destPath, StringComparison.OrdinalIgnoreCase))
                             {
                                 BitmapSource source = ImageHelpers.ScaleSourceImage(
-                                    item.Bitmap, image.GetScaledWidth(scale), image.GetScaledHeight(scale));
+                                    item.SourceForCurrentThread, image.GetScaledWidth(scale), image.GetScaledHeight(scale));
                                 source = ImageHelpers.TransformImage(source, image.TransformType);
-                                ImageHelpers.SavePng(source, destPath);
+                                ImageHelpers.Save(source, item.SourceImageType, destPath);
                                 yield return destPath;
                             }
                         }
@@ -128,8 +124,8 @@ namespace UniversalImageScaler
                             string destPath = Path.Combine(item.FullDir, image.GetTargetSizeFileName(targetSize));
                             if (!string.Equals(item.FullPath, destPath, StringComparison.OrdinalIgnoreCase))
                             {
-                                BitmapSource source = ImageHelpers.ScaleSourceImage(fileBytes, (int)targetSize, (int)targetSize);
-                                ImageHelpers.SavePng(source, destPath);
+                                BitmapSource source = ImageHelpers.ScaleSourceImage(item.SourceForCurrentThread, (int)targetSize, (int)targetSize);
+                                ImageHelpers.Save(source, item.SourceImageType, destPath);
                                 yield return destPath;
 
                                 string unplatedPath = Path.Combine(item.FullDir, image.GetUnplatedTargetSizeFileName(targetSize));

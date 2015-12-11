@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using UniversalImageScaler.Utility;
 
@@ -17,12 +18,15 @@ namespace UniversalImageScaler.Models
         private double scale;
         private List<DestImageModel> images;
         private BitmapImage bitmap;
+        private ImageFileType imageType;
         private double pixelWidth;
         private double pixelHeight;
+        private ThreadHelper mainThreadHelper;
 
         public SourceImageModel(VSITEMSELECTION item)
         {
             this.item = item;
+            this.mainThreadHelper = ThreadHelper.Generic;
 
             if (item.pHier == null)
             {
@@ -52,6 +56,7 @@ namespace UniversalImageScaler.Models
                 throw new ArgumentException("item must be an image");
             }
 
+            this.imageType = ImageHelpers.GetFileType(this.path);
             this.bitmap = ImageHelpers.LoadSourceImage(this.path);
             this.pixelWidth = this.bitmap.PixelWidth;
             this.pixelHeight = this.bitmap.PixelHeight;
@@ -86,20 +91,19 @@ namespace UniversalImageScaler.Models
                 {
                     info.Generate = true;
                 }
-
-                if (this.IsSquare != info.IsSquare &&
-                    this.IsWide != info.IsWide)
-                {
-                    info.Enabled = false;
-                }
             }
 
             this.images.RemoveAll(info => !info.Enabled);
         }
 
-        public BitmapImage Bitmap
+        public ImageFileType SourceImageType
         {
-            get { return this.bitmap; }
+            get { return this.imageType; }
+        }
+
+        public BitmapSource SourceForCurrentThread
+        {
+            get { return ImageHelpers.GetSourceForCurrentThread(this.mainThreadHelper, this.bitmap); }
         }
 
         public double PixelWidth

@@ -56,7 +56,7 @@ namespace UniversalImageScaler.Utility
                 object nameObj;
                 if (sel.pHier.GetProperty(sel.itemid, (int)__VSHPROPID.VSHPROPID_Name, out nameObj) >= 0)
                 {
-                    isImage = ImageHelpers.IsSourceImageName(nameObj as string);
+                    isImage = ImageHelpers.IsSourceImageFile(nameObj as string);
                 }
             }
 
