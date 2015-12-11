@@ -4,9 +4,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UniversalImageScaler.Utility;
 
-namespace UniversalImageScaler
+namespace UniversalImageScaler.Models
 {
-    internal class ImageInfo : ModelBase
+    internal class DestImageModel : ModelBase
     {
         private int width;
         private int height;
@@ -15,9 +15,9 @@ namespace UniversalImageScaler
         private string extension;
         private bool enabled;
         private bool generate;
-        private ImageResizeInfo owner;
+        private SourceImageModel owner;
 
-        public ImageInfo(ImageResizeInfo owner, string name, int width, int height, params int[] targetSizes)
+        public DestImageModel(SourceImageModel owner, string name, int width, int height, params int[] targetSizes)
         {
             this.owner = owner;
             this.name = name;

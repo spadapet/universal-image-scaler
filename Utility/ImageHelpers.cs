@@ -42,25 +42,13 @@ namespace UniversalImageScaler.Utility
         {
             BitmapImage bitmap = new BitmapImage();
             bitmap.BeginInit();
-            bitmap.DecodePixelWidth = width;
-            bitmap.DecodePixelHeight = height;
             bitmap.StreamSource = new MemoryStream(sourceBytes);
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
             bitmap.EndInit();
 
-            return bitmap
-        }
+            BitmapSource source = bitmap;
 
-        public static BitmapSource TransformImage(BitmapSource source, ImageTransformType type)
-        {
-            switch (type)
-            {
-                case ImageTransformType.None:
-                    break;
-
-                case ImageTransformType.WhiteOnly:
-                    source = TransformImageWhiteOnly(source);
-                    break;
-            }
+            // source = new TransformedBitmap(source, new ScaleTransform(...));
 
             return source;
         }
@@ -81,6 +69,21 @@ namespace UniversalImageScaler.Utility
                 byte[] bytes = streamOut.ToArray();
                 File.WriteAllBytes(path, bytes);
             }
+        }
+
+        public static BitmapSource TransformImage(BitmapSource source, ImageTransformType type)
+        {
+            switch (type)
+            {
+                case ImageTransformType.None:
+                    break;
+
+                case ImageTransformType.WhiteOnly:
+                    source = TransformImageWhiteOnly(source);
+                    break;
+            }
+
+            return source;
         }
 
         private static BitmapSource TransformImageWhiteOnly(BitmapSource source)

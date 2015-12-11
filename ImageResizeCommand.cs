@@ -11,6 +11,7 @@ using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using UniversalImageScaler.Models;
 using UniversalImageScaler.Utility;
 using OLECMDF = Microsoft.VisualStudio.OLE.Interop.OLECMDF;
 using Task = System.Threading.Tasks.Task;
@@ -38,7 +39,7 @@ namespace UniversalImageScaler
             {
                 try
                 {
-                    ImageResizeInfo item = new ImageResizeInfo(sel);
+                    SourceImageModel item = new SourceImageModel(sel);
                     ImageResizeDialog dialog = new ImageResizeDialog(item);
                     bool? result = dialog.ShowModal();
 
@@ -70,7 +71,7 @@ namespace UniversalImageScaler
             }
         }
 
-        private async Task GenerateImagesMainThread(VSITEMSELECTION sel, ImageResizeInfo item)
+        private async Task GenerateImagesMainThread(VSITEMSELECTION sel, SourceImageModel item)
         {
             CommonMessagePump pump = new CommonMessagePump();
             pump.AllowCancel = true;
@@ -94,11 +95,11 @@ namespace UniversalImageScaler
             await task;
         }
 
-        private IEnumerable<string> GenerateImages(VSITEMSELECTION sel, ImageResizeInfo item, CancellationToken token)
+        private IEnumerable<string> GenerateImages(VSITEMSELECTION sel, SourceImageModel item, CancellationToken token)
         {
             byte[] fileBytes = File.ReadAllBytes(item.FullPath);
 
-            foreach (ImageInfo image in item.Images)
+            foreach (DestImageModel image in item.Images)
             {
                 OnBeforeGenerateImages(sel, item, image);
 
@@ -144,7 +145,7 @@ namespace UniversalImageScaler
             }
         }
 
-        private void OnBeforeGenerateImages(VSITEMSELECTION sel, ImageResizeInfo item, ImageInfo image)
+        private void OnBeforeGenerateImages(VSITEMSELECTION sel, SourceImageModel item, DestImageModel image)
         {
             // Remove existing images
 

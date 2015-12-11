@@ -6,21 +6,21 @@ using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.Shell.Interop;
 using UniversalImageScaler.Utility;
 
-namespace UniversalImageScaler
+namespace UniversalImageScaler.Models
 {
-    internal class ImageResizeInfo : ModelBase
+    internal class SourceImageModel : ModelBase
     {
         private VSITEMSELECTION item;
         private string name;
         private string dir;
         private string path;
         private double scale;
-        private List<ImageInfo> images;
+        private List<DestImageModel> images;
         private BitmapImage bitmap;
         private int pixelWidth;
         private int pixelHeight;
 
-        public ImageResizeInfo(VSITEMSELECTION item)
+        public SourceImageModel(VSITEMSELECTION item)
         {
             this.item = item;
 
@@ -55,27 +55,27 @@ namespace UniversalImageScaler
             this.bitmap = new BitmapImage(new Uri(this.path));
             this.pixelWidth = this.bitmap.PixelWidth;
             this.pixelHeight = this.bitmap.PixelHeight;
-            this.images = new List<ImageInfo>();
+            this.images = new List<DestImageModel>();
 
             if (this.scale == 0.0)
             {
-                this.images.Add(new ImageInfo(this, "Square 71x71 Logo", 71, 71));
-                this.images.Add(new ImageInfo(this, "Square 150x150 Logo", 150, 150));
-                this.images.Add(new ImageInfo(this, "Wide 310x150 Logo", 310, 150));
-                this.images.Add(new ImageInfo(this, "Square 310x310 Logo", 310, 310));
-                this.images.Add(new ImageInfo(this, "Square 44x44 Logo", 44, 44, 256, 48, 24, 16));
-                this.images.Add(new ImageInfo(this, "Store Logo", 50, 50));
-                this.images.Add(new ImageInfo(this, "Badge Logo", 24, 24) { TransformType = ImageTransformType.WhiteOnly });
-                this.images.Add(new ImageInfo(this, "Splash Screen", 620, 300));
+                this.images.Add(new DestImageModel(this, "Square 71x71 Logo", 71, 71));
+                this.images.Add(new DestImageModel(this, "Square 150x150 Logo", 150, 150));
+                this.images.Add(new DestImageModel(this, "Wide 310x150 Logo", 310, 150));
+                this.images.Add(new DestImageModel(this, "Square 310x310 Logo", 310, 310));
+                this.images.Add(new DestImageModel(this, "Square 44x44 Logo", 44, 44, 256, 48, 24, 16));
+                this.images.Add(new DestImageModel(this, "Store Logo", 50, 50));
+                this.images.Add(new DestImageModel(this, "Badge Logo", 24, 24) { TransformType = ImageTransformType.WhiteOnly });
+                this.images.Add(new DestImageModel(this, "Splash Screen", 620, 300));
             }
             else
             {
-                this.images.Add(new ImageInfo(this, this.name,
+                this.images.Add(new DestImageModel(this, this.name,
                     (int)(this.pixelWidth / this.scale),
                     (int)(this.pixelHeight / this.scale)));
             }
 
-            foreach (ImageInfo info in this.images)
+            foreach (DestImageModel info in this.images)
             {
                 if (this.IsSquare && info.IsSquare)
                 {
@@ -139,7 +139,7 @@ namespace UniversalImageScaler
             }
         }
 
-        public IEnumerable<ImageInfo> Images
+        public IEnumerable<DestImageModel> Images
         {
             get
             {
