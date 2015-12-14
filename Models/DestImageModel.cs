@@ -71,8 +71,8 @@ namespace UniversalImageScaler.Models
                     double width = this.GetScaledWidth(scale);
                     double height = this.GetScaledHeight(scale);
 
-                    if (width <= this.owner.PixelWidth &&
-                        height <= this.owner.PixelHeight)
+                    if (width <= this.owner.SourceImage.PixelWidth &&
+                        height <= this.owner.SourceImage.PixelHeight)
                     {
                         yield return scale;
                     }
@@ -103,8 +103,8 @@ namespace UniversalImageScaler.Models
             {
                 foreach (int targetSize in this.targetSizes)
                 {
-                    if (targetSize <= owner.PixelWidth &&
-                        targetSize <= owner.PixelHeight)
+                    if (targetSize <= owner.SourceImage.PixelWidth &&
+                        targetSize <= owner.SourceImage.PixelHeight)
                     {
                         yield return targetSize;
                     }

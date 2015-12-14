@@ -12,16 +12,15 @@ namespace UniversalImageScaler.Models
     internal class SourceImageModel : ModelBase
     {
         private VSITEMSELECTION item;
-        private string name;
-        private string dir;
-        private string path;
-        private double scale;
-        private List<DestImageModel> images;
-        private BitmapImage bitmap;
-        private ImageFileType imageType;
-        private double pixelWidth;
-        private double pixelHeight;
         private ThreadHelper mainThreadHelper;
+        private List<DestImageModel> images;
+
+        private string sourcePath;
+        private int sourcePathScaleStart;
+        private int sourcePathScaleLength;
+        private BitmapImage sourceImage;
+        private ImageFileType sourceImageType;
+        private double? sourceScale;
 
         public SourceImageModel(VSITEMSELECTION item)
         {
@@ -33,21 +32,32 @@ namespace UniversalImageScaler.Models
                 throw new ArgumentNullException("item.pHier");
             }
 
-            object nameObj;
-            if (item.pHier.GetCanonicalName(item.itemid, out this.path) >= 0 &&
-                item.pHier.GetProperty(item.itemid, (int)__VSHPROPID.VSHPROPID_Name, out nameObj) >= 0)
-            {
-                this.name = (string)nameObj;
-                this.dir = Path.GetDirectoryName(this.path);
-                this.path = Path.Combine(this.dir, this.name);
+            InitSourcePathAndScale();
+            InitSourceImage();
+            InitDestImages();
+            SetDestImageDefaults();
+        }
 
-                Match match = Regex.Match(this.name, @".*\.scale-(?<scale>\d{3})\.(?:png|jpg)");
-                if (match != null && match.Success)
+        private void InitSourcePathAndScale()
+        {
+            object nameObj;
+            if (item.pHier.GetCanonicalName(item.itemid, out this.sourcePath) >= 0 &&
+                item.pHier.GetProperty(item.itemid, (int)__VSHPROPID.VSHPROPID_Name, out nameObj) >= 0 &&
+                nameObj is string)
+            {
+                // Replace the lower-case name with the original case
+                this.sourcePath = Path.Combine(Path.GetDirectoryName(this.sourcePath), (string)nameObj);
+
+                Match match = Regex.Match(this.sourcePath, @"\.scale-(?<scale>\d{3})\.");
+                if (match != null && match.Success && match.Index >= this.sourcePath.Length - Path.GetFileName(this.sourcePath).Length)
                 {
+                    this.sourcePathScaleStart = match.Index;
+                    this.sourcePathScaleLength = match.Length;
+
                     int scale;
-                    if (int.TryParse(match.Groups["scale"].Value, out scale))
+                    if (int.TryParse(match.Groups["scale"].Value, out scale) && scale > 0)
                     {
-                        this.scale = scale / 100.0;
+                        this.sourceScale = scale / 100.0;
                     }
                 }
             }
@@ -55,14 +65,19 @@ namespace UniversalImageScaler.Models
             {
                 throw new ArgumentException("item must be an image");
             }
+        }
 
-            this.imageType = ImageHelpers.GetFileType(this.path);
-            this.bitmap = ImageHelpers.LoadSourceImage(this.path);
-            this.pixelWidth = this.bitmap.PixelWidth;
-            this.pixelHeight = this.bitmap.PixelHeight;
+        private void InitSourceImage()
+        {
+            this.sourceImageType = ImageHelpers.GetFileType(this.sourcePath);
+            this.sourceImage = ImageHelpers.LoadSourceImage(this.sourcePath);
+        }
+
+        private void InitDestImages()
+        {
             this.images = new List<DestImageModel>();
 
-            if (this.scale == 0.0)
+            if (this.sourceScale.HasValue)
             {
                 this.images.Add(new DestImageModel(this, "Square 71x71 Logo", 71, 71));
                 this.images.Add(new DestImageModel(this, "Square 150x150 Logo", 150, 150));
@@ -75,85 +90,60 @@ namespace UniversalImageScaler.Models
             }
             else
             {
-                this.images.Add(new DestImageModel(this, this.name,
-                    (int)(this.pixelWidth / this.scale),
-                    (int)(this.pixelHeight / this.scale)));
+                this.images.Add(new DestImageModel(this, this.SourceFileName,
+                    (int)(this.sourceImage.PixelWidth / this.sourceScale.Value),
+                    (int)(this.sourceImage.PixelHeight / this.sourceScale.Value)));
             }
+        }
+
+        private void SetDestImageDefaults()
+        {
+            bool isSquare = this.sourceImage.PixelWidth == this.sourceImage.PixelHeight;
 
             foreach (DestImageModel info in this.images)
             {
-                if (this.IsSquare && info.IsSquare)
+                if (isSquare && info.IsSquare)
                 {
                     info.Generate = true;
                 }
 
-                if (this.IsWide && info.IsWide)
+                if (isSquare && info.IsWide)
                 {
                     info.Generate = true;
                 }
             }
 
-            this.images.RemoveAll(info => !info.Enabled);
+            images.RemoveAll(info => !info.Enabled);
         }
 
         public ImageFileType SourceImageType
         {
-            get { return this.imageType; }
+            get { return this.sourceImageType; }
         }
 
-        public BitmapSource SourceForCurrentThread
+        public BitmapSource SourceImage
         {
-            get { return ImageHelpers.GetSourceForCurrentThread(this.mainThreadHelper, this.bitmap); }
+            get { return this.sourceImage; }
         }
 
-        public double PixelWidth
+        public string SourceFileName
         {
-            get { return this.pixelWidth; }
+            get { return Path.GetFileName(this.sourcePath); }
         }
 
-        public double PixelHeight
+        public string FullSourceDir
         {
-            get { return this.pixelHeight; }
+            get { return Path.GetDirectoryName(this.sourcePath); }
         }
 
-        public double Scale
+        public string FullSourcePath
         {
-            get
-            {
-                return this.scale;
-            }
-        }
-
-        public string FileName
-        {
-            get
-            {
-                return this.name;
-            }
-        }
-
-        public string FullDir
-        {
-            get
-            {
-                return this.dir;
-            }
-        }
-
-        public string FullPath
-        {
-            get
-            {
-                return this.path;
-            }
+            get { return this.sourcePath; }
         }
 
         public IEnumerable<DestImageModel> Images
         {
-            get
-            {
-                return this.images;
-            }
+            get { return this.images; }
         }
 
         public string HeaderText
@@ -166,28 +156,9 @@ namespace UniversalImageScaler.Models
             }
         }
 
-        public bool IsSquare
-        {
-            get
-            {
-                return this.bitmap != null && this.pixelWidth == this.pixelHeight;
-            }
-        }
-
-        public bool IsWide
-        {
-            get
-            {
-                return this.bitmap != null && this.pixelWidth > this.pixelHeight;
-            }
-        }
-
         public bool IsManifestImage
         {
-            get
-            {
-                return this.scale == 0.0;
-            }
+            get { return !this.sourceScale.HasValue; }
         }
     }
 }

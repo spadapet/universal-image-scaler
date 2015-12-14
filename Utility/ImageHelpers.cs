@@ -87,16 +87,9 @@ namespace UniversalImageScaler.Utility
             bitmap.UriSource = new Uri(path);
             bitmap.CacheOption = BitmapCacheOption.OnLoad;
             bitmap.EndInit();
+            bitmap.Freeze();
 
             return bitmap;
-        }
-
-        public static BitmapSource GetSourceForCurrentThread(ThreadHelper threadHelper, BitmapSource source)
-        {
-            return threadHelper.Invoke(() =>
-            {
-                return source.Clone();
-            });
         }
 
         public static BitmapSource ScaleSourceImage(BitmapSource source, double width, double height)
