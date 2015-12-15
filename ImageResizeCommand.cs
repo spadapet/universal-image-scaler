@@ -18,14 +18,12 @@ namespace UniversalImageScaler
     {
         private IServiceProvider serviceProvider;
         private IVsMonitorSelection monitorSelection;
-        private ThreadHelper mainThreadHelper;
 
         public ImageResizeCommand(IServiceProvider serviceProvider, CommandID commandId)
             : base(null, commandId)
         {
             this.serviceProvider = serviceProvider;
             this.monitorSelection = serviceProvider.GetService(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
-            this.mainThreadHelper = ThreadHelper.Generic;
         }
 
         public override async void Invoke()
@@ -145,7 +143,7 @@ namespace UniversalImageScaler
         {
             // Remove existing images
 
-            this.mainThreadHelper.Invoke(() =>
+            ImageResizePackage.Instance.MainThreadHelper.Invoke(() =>
             {
                 string file = Path.Combine(item.FullSourceDir, image.FileNameAndExtension);
                 EnvDTE.Project dteProject = sel.pHier.GetProject();
@@ -167,7 +165,7 @@ namespace UniversalImageScaler
         {
             // Add the new image to the project
 
-            this.mainThreadHelper.Invoke(() =>
+            ImageResizePackage.Instance.MainThreadHelper.Invoke(() =>
             {
                 EnvDTE.Project dteProject = sel.pHier.GetProject();
                 if (this.serviceProvider.FindProjectItem(file) == null)

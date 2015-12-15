@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using UniversalImageScaler.Utility;
 
@@ -12,7 +11,6 @@ namespace UniversalImageScaler.Models
     internal class SourceImageModel : ModelBase
     {
         private VSITEMSELECTION item;
-        private ThreadHelper mainThreadHelper;
         private List<DestImageModel> images;
 
         private string sourcePath;
@@ -25,12 +23,6 @@ namespace UniversalImageScaler.Models
         public SourceImageModel(VSITEMSELECTION item)
         {
             this.item = item;
-            this.mainThreadHelper = ThreadHelper.Generic;
-
-            if (item.pHier == null)
-            {
-                throw new ArgumentNullException("item.pHier");
-            }
 
             InitSourcePathAndScale();
             InitSourceImage();
@@ -129,6 +121,15 @@ namespace UniversalImageScaler.Models
         public string SourceFileName
         {
             get { return Path.GetFileName(this.sourcePath); }
+        }
+
+        public string SourceFileNameWithoutScale
+        {
+            get
+            {
+                string path = this.sourcePath.Remove(this.sourcePathScaleStart, this.sourcePathScaleLength - 1);
+                return Path.GetFileName(path);
+            }
         }
 
         public string FullSourceDir

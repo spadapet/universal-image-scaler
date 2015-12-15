@@ -18,16 +18,22 @@ namespace UniversalImageScaler
         private const string CommandSetGuidString = "d4e44266-2d61-4268-ac51-b3392512cbbf"; 
         private const int ImageResizeCommandId = 1;
 
+        public static ImageResizePackage Instance { get; private set; }
+        public ThreadHelper MainThreadHelper { get; }
+
         private List<MenuCommand> menuCommands;
         private IMenuCommandService menuCommandService;
 
         public ImageResizePackage()
         {
+            this.MainThreadHelper = ThreadHelper.Generic;
             this.menuCommands = new List<MenuCommand>();
         }
 
         protected override void Initialize()
         {
+            ImageResizePackage.Instance = this;
+
             base.Initialize();
 
             AddMenuCommands();
@@ -37,6 +43,11 @@ namespace UniversalImageScaler
         {
             if (disposing)
             {
+                if (ImageResizePackage.Instance == this)
+                {
+                    ImageResizePackage.Instance = null;
+                }
+
                 RemoveMenuCommands();
             }
 
