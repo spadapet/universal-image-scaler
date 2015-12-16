@@ -33,7 +33,7 @@ namespace UniversalImageScaler
             {
                 try
                 {
-                    SourceImageModel item = new SourceImageModel(sel);
+                    SourceImage item = new SourceImage(sel);
                     ImageResizeDialog dialog = new ImageResizeDialog(item);
                     bool? result = dialog.ShowModal();
 
@@ -65,7 +65,7 @@ namespace UniversalImageScaler
             }
         }
 
-        private async Task GenerateImagesMainThread(VSITEMSELECTION sel, SourceImageModel item)
+        private async Task GenerateImagesMainThread(VSITEMSELECTION sel, SourceImage item)
         {
             CommonMessagePump pump = new CommonMessagePump();
             pump.AllowCancel = true;
@@ -89,11 +89,11 @@ namespace UniversalImageScaler
             await task;
         }
 
-        private IEnumerable<string> GenerateImages(VSITEMSELECTION sel, SourceImageModel item, CancellationToken token)
+        private IEnumerable<string> GenerateImages(VSITEMSELECTION sel, SourceImage item, CancellationToken token)
         {
-            byte[] fileBytes = File.ReadAllBytes(item.FullSourcePath);
-
-            foreach (DestImageModel image in item.Images)
+            yield break;
+#if false
+            foreach (OutputImage image in item.Images)
             {
                 OnBeforeGenerateImages(sel, item, image);
 
@@ -103,13 +103,13 @@ namespace UniversalImageScaler
                     {
                         if (!token.IsCancellationRequested)
                         {
-                            string destPath = Path.Combine(item.FullSourceDir, image.GetScaledFileName(scale));
-                            if (!string.Equals(item.FullSourcePath, destPath, StringComparison.OrdinalIgnoreCase))
+                            string destPath = Path.Combine(item.FullDir, image.GetScaledFileName(scale));
+                            if (!string.Equals(item.FullPath, destPath, StringComparison.OrdinalIgnoreCase))
                             {
                                 BitmapSource source = ImageHelpers.ScaleSourceImage(
-                                    item.SourceImage, image.GetScaledWidth(scale), image.GetScaledHeight(scale));
+                                    item.Image, image.GetScaledWidth(scale), image.GetScaledHeight(scale));
                                 source = ImageHelpers.TransformImage(source, image.TransformType);
-                                ImageHelpers.Save(source, item.SourceImageType, destPath);
+                                ImageHelpers.Save(source, item.ImageType, destPath);
                                 yield return destPath;
                             }
                         }
@@ -119,15 +119,15 @@ namespace UniversalImageScaler
                     {
                         if (!token.IsCancellationRequested)
                         {
-                            string destPath = Path.Combine(item.FullSourceDir, image.GetTargetSizeFileName(targetSize));
-                            if (!string.Equals(item.FullSourcePath, destPath, StringComparison.OrdinalIgnoreCase))
+                            string destPath = Path.Combine(item.FullDir, image.GetTargetSizeFileName(targetSize));
+                            if (!string.Equals(item.FullPath, destPath, StringComparison.OrdinalIgnoreCase))
                             {
-                                BitmapSource source = ImageHelpers.ScaleSourceImage(item.SourceImage, (int)targetSize, (int)targetSize);
-                                ImageHelpers.Save(source, item.SourceImageType, destPath);
+                                BitmapSource source = ImageHelpers.ScaleSourceImage(item.Image, (int)targetSize, (int)targetSize);
+                                ImageHelpers.Save(source, item.ImageType, destPath);
                                 yield return destPath;
 
-                                string unplatedPath = Path.Combine(item.FullSourceDir, image.GetUnplatedTargetSizeFileName(targetSize));
-                                if (!string.Equals(item.FullSourcePath, unplatedPath, StringComparison.OrdinalIgnoreCase))
+                                string unplatedPath = Path.Combine(item.FullDir, image.GetUnplatedTargetSizeFileName(targetSize));
+                                if (!string.Equals(item.FullPath, unplatedPath, StringComparison.OrdinalIgnoreCase))
                                 {
                                     File.Copy(destPath, unplatedPath, true);
                                     yield return unplatedPath;
@@ -137,15 +137,16 @@ namespace UniversalImageScaler
                     }
                 }
             }
+#endif
         }
 
-        private void OnBeforeGenerateImages(VSITEMSELECTION sel, SourceImageModel item, DestImageModel image)
+        private void OnBeforeGenerateImages(VSITEMSELECTION sel, SourceImage item, OutputImage image)
         {
             // Remove existing images
 
             ImageResizePackage.Instance.MainThreadHelper.Invoke(() =>
             {
-                string file = Path.Combine(item.FullSourceDir, image.FileNameAndExtension);
+                string file = Path.Combine(item.FullDir, image.FileNameAndExtension);
                 EnvDTE.Project dteProject = sel.pHier.GetProject();
                 EnvDTE.ProjectItem dteItem = this.serviceProvider.FindProjectItem(file);
                 if (dteItem != null)

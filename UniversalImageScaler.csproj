@@ -52,12 +52,14 @@
     <Compile Include="ImageResizeDialog.xaml.cs">
       <DependentUpon>ImageResizeDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\SourceImageModel.cs" />
+    <Compile Include="Models\OutputSets.cs" />
+    <Compile Include="Models\OutputSet.cs" />
+    <Compile Include="Models\SourceImage.cs" />
     <Compile Include="ImageResizePackage.cs" />
-    <Compile Include="Models\DestImageModel.cs" />
+    <Compile Include="Models\OutputImage.cs" />
     <Compile Include="Utility\DteHelpers.cs" />
     <Compile Include="Utility\ImageHelpers.cs" />
-    <Compile Include="Utility\ModelBase.cs" />
+    <Compile Include="Models\ModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\SelectionHelpers.cs" />
   </ItemGroup>

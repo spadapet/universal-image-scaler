@@ -6,14 +6,14 @@ namespace UniversalImageScaler
 {
     internal partial class ImageResizeDialog : DialogWindow
     {
-        private SourceImageModel item;
+        private SourceImage item;
 
         public ImageResizeDialog()
             : this(null)
         {
         }
 
-        public ImageResizeDialog(SourceImageModel item)
+        public ImageResizeDialog(SourceImage item)
         {
             this.item = item;
             this.DataContext = item;

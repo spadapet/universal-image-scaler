@@ -6,7 +6,7 @@ using UniversalImageScaler.Utility;
 
 namespace UniversalImageScaler.Models
 {
-    internal class DestImageModel : ModelBase
+    internal class OutputImage : ModelBase
     {
         private int width;
         private int height;
@@ -15,9 +15,9 @@ namespace UniversalImageScaler.Models
         private string extension;
         private bool enabled;
         private bool generate;
-        private SourceImageModel owner;
+        private SourceImage owner;
 
-        public DestImageModel(SourceImageModel owner, string name, int width, int height, params int[] targetSizes)
+        public OutputImage(SourceImage owner, string name, int width, int height, params int[] targetSizes)
         {
             this.owner = owner;
             this.name = name;
@@ -71,8 +71,8 @@ namespace UniversalImageScaler.Models
                     double width = this.GetScaledWidth(scale);
                     double height = this.GetScaledHeight(scale);
 
-                    if (width <= this.owner.SourceImage.PixelWidth &&
-                        height <= this.owner.SourceImage.PixelHeight)
+                    if (width <= this.owner.Image.PixelWidth &&
+                        height <= this.owner.Image.PixelHeight)
                     {
                         yield return scale;
                     }
@@ -86,11 +86,11 @@ namespace UniversalImageScaler.Models
             {
                 yield return 1.0;
 
-                if (this.owner.IsManifestImage)
-                {
-                    yield return 1.25;
-                    yield return 1.5;
-                }
+                //if (this.owner.IsManifestImage)
+                //{
+                //    yield return 1.25;
+                //    yield return 1.5;
+                //}
 
                 yield return 2.0;
                 yield return 4.0;
@@ -103,8 +103,8 @@ namespace UniversalImageScaler.Models
             {
                 foreach (int targetSize in this.targetSizes)
                 {
-                    if (targetSize <= owner.SourceImage.PixelWidth &&
-                        targetSize <= owner.SourceImage.PixelHeight)
+                    if (targetSize <= owner.Image.PixelWidth &&
+                        targetSize <= owner.Image.PixelHeight)
                     {
                         yield return targetSize;
                     }
@@ -184,7 +184,8 @@ namespace UniversalImageScaler.Models
         {
             get
             {
-                return this.owner.IsManifestImage ? this.name.Replace(" ", string.Empty) : this.name;
+                return this.name;
+                //return this.owner.IsManifestImage ? this.name.Replace(" ", string.Empty) : this.name;
             }
         }
 
