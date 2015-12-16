@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using Microsoft.VisualStudio.PlatformUI;
 using UniversalImageScaler.Models;
 
@@ -9,7 +10,7 @@ namespace UniversalImageScaler
         private SourceImage item;
 
         public ImageResizeDialog()
-            : this(null)
+            : this(ImageResizeDialog.CreateSampleSourceImage())
         {
         }
 
@@ -31,6 +32,11 @@ namespace UniversalImageScaler
         {
             this.DialogResult = false;
             this.Close();
+        }
+
+        private static SourceImage CreateSampleSourceImage()
+        {
+            return new SourceImage();
         }
     }
 }

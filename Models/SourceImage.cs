@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.Shell.Interop;
 using UniversalImageScaler.Utility;
@@ -15,13 +18,54 @@ namespace UniversalImageScaler.Models
         private string path;
         private int pathScaleStart;
         private int pathScaleLength;
-        private BitmapImage image;
+        private BitmapSource image;
         private ImageFileType imageType;
         private double? scale;
+        private ObservableCollection<OutputFeature> features;
+
+        public SourceImage()
+        {
+            this.path = @"x:\test\image.scale-400.png";
+            this.pathScaleStart = 13;
+            this.pathScaleLength = 11;
+            this.imageType = ImageFileType.Png;
+            this.scale = 400;
+            this.features = new ObservableCollection<OutputFeature>();
+
+            byte[] bytes = new byte[32 * 32 * 4];
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes[i] = 255;
+            }
+
+            WriteableBitmap image = new WriteableBitmap(32, 32, 96, 96, PixelFormats.Bgra32, null);
+            image.WritePixels(new Int32Rect(0, 0, 32, 32), bytes, 32 * 4, 0);
+            image.Freeze();
+            this.image = image;
+
+            OutputFeature feature = new OutputFeature("Test feature");
+            this.features.Add(feature);
+
+            OutputSet set = new OutputSet(this, "Test image", 8, 8, true);
+            feature.AddSet(set);
+
+            OutputImage output = new OutputImageScale(set, 200);
+            set.AddImage(output);
+
+            output = new OutputImageScale(set, 100);
+            set.AddImage(output);
+
+            output = new OutputImageTargetSize(set, 16, true);
+            set.AddImage(output);
+
+            output = new OutputImageTargetSize(set, 16, false);
+            set.AddImage(output);
+        }
 
         public SourceImage(VSITEMSELECTION item)
         {
             this.item = item;
+            this.features = new ObservableCollection<OutputFeature>();
 
             InitSourcePathAndScale();
             InitSourceImage();
@@ -31,8 +75,8 @@ namespace UniversalImageScaler.Models
         private void InitSourcePathAndScale()
         {
             object nameObj;
-            if (item.pHier.GetCanonicalName(item.itemid, out this.path) >= 0 &&
-                item.pHier.GetProperty(item.itemid, (int)__VSHPROPID.VSHPROPID_Name, out nameObj) >= 0 &&
+            if (this.item.pHier.GetCanonicalName(this.item.itemid, out this.path) >= 0 &&
+                this.item.pHier.GetProperty(this.item.itemid, (int)__VSHPROPID.VSHPROPID_Name, out nameObj) >= 0 &&
                 nameObj is string)
             {
                 // Replace the lower-case name with the original case
@@ -49,6 +93,12 @@ namespace UniversalImageScaler.Models
                     {
                         this.scale = scale / 100.0;
                     }
+                }
+                else
+                {
+                    string extension = Path.GetExtension(this.path);
+                    this.pathScaleStart = this.path.Length - extension.Length;
+                    this.pathScaleLength = 0;
                 }
             }
             else
@@ -86,6 +136,11 @@ namespace UniversalImageScaler.Models
             //}
         }
 
+        public IEnumerable<OutputFeature> Features
+        {
+            get { return this.features; }
+        }
+
         public ImageFileType ImageType
         {
             get { return this.imageType; }
@@ -101,16 +156,39 @@ namespace UniversalImageScaler.Models
             get { return Path.GetFileName(this.path); }
         }
 
-        public string FileNameWithoutScale
+        public string UnscaledPath
         {
-            get
-            {
-                string path = this.pathScaleLength > 0
-                    ? this.path.Remove(this.pathScaleStart, this.pathScaleLength - 1)
-                    : this.path;
+            get { return this.GetScaledPath(0); }
+        }
 
-                return Path.GetFileName(path);
+        public string GetScaledPath(double scale)
+        {
+            string path = this.pathScaleLength > 0
+                ? this.path.Remove(this.pathScaleStart, this.pathScaleLength - 1)
+                : this.path;
+
+            if (scale > 0)
+            {
+                path = path.Insert(this.pathScaleStart, $".scale-{(int)(scale * 100.0)}");
             }
+
+            return path;
+        }
+
+        public string GetTargetSizePath(double targetSize, bool unplated)
+        {
+            string path = this.pathScaleLength > 0
+                ? this.path.Remove(this.pathScaleStart, this.pathScaleLength - 1)
+                : this.path;
+
+            if (targetSize > 0)
+            {
+                path = unplated
+                    ? path.Insert(this.pathScaleStart, $".targetsize-{(int)targetSize}_altform-unplated")
+                    : path.Insert(this.pathScaleStart, $".targetsize-{(int)targetSize}");
+            }
+
+            return path;
         }
 
         public string FullDir

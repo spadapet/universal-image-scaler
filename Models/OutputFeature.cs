@@ -3,12 +3,12 @@ using System.Collections.ObjectModel;
 
 namespace UniversalImageScaler.Models
 {
-    internal class OutputSets : ModelBase
+    internal class OutputFeature : ModelBase
     {
         private string name;
         private ObservableCollection<OutputSet> sets;
 
-        public OutputSets(string name)
+        public OutputFeature(string name)
         {
             this.name = name;
             this.sets = new ObservableCollection<OutputSet>();
@@ -17,14 +17,6 @@ namespace UniversalImageScaler.Models
         public string Name
         {
             get { return this.name; }
-            set
-            {
-                if (this.name != value)
-                {
-                    this.name = value ?? string.Empty;
-                    this.OnPropertyChanged(nameof(this.Name));
-                }
-            }
         }
 
         public IEnumerable<OutputSet> Sets

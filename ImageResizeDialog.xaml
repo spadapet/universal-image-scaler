@@ -8,26 +8,14 @@
         xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
         mc:Ignorable="d"
         Title="Scaled image generator"
-        ResizeMode="NoResize"
+        ResizeMode="CanResizeWithGrip"
         Width="450"
         Height="500"
         Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}">
+
     <vsui:DialogWindow.Resources>
-        <Style TargetType="{x:Type HeaderedItemsControl}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type HeaderedItemsControl}">
-                        <StackPanel Orientation="Vertical">
-                            <ContentPresenter ContentSource="Header" />
-                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
-                                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                            </Border>
-                        </StackPanel>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </vsui:DialogWindow.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -40,22 +28,15 @@
                 Margin="0,5,0,0"
                 BorderThickness="1"
                 BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}">
-                <Image Stretch="Uniform" Width="150" Height="150" Source="{Binding FullPath}" />
+                <Image
+                    Stretch="Uniform"
+                    Width="150"
+                    Height="150"
+                    Source="{Binding Image}" />
             </Border>
             <TextBlock Margin="0,5,0,0">
                 <Run Text="Destination is " /><Run Text="{Binding FullDir, Mode=OneTime}" />
             </TextBlock>
-            <HeaderedItemsControl Margin="0,5,0,0" ItemsSource="{Binding Images}" Header="{Binding HeaderText}">
-                <HeaderedItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <CheckBox IsChecked="{Binding Generate, Mode=TwoWay}" IsEnabled="{Binding Enabled}" Margin="0,5,0,0">
-                            <CheckBox.Content>
-                                <TextBlock Text="{Binding DisplayText, Mode=OneTime}" />
-                            </CheckBox.Content>
-                        </CheckBox>
-                    </DataTemplate>
-                </HeaderedItemsControl.ItemTemplate>
-            </HeaderedItemsControl>
         </StackPanel>
         <Grid Grid.Row="1" Grid.IsSharedSizeScope="True" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
