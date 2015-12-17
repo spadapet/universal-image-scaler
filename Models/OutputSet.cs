@@ -22,6 +22,8 @@ namespace UniversalImageScaler.Models
             this.height = height;
             this.fixedSize = fixedSize;
             this.images = new ObservableCollection<OutputImage>();
+
+            this.UpdateGenerate();
         }
 
         public SourceImage Owner
@@ -97,6 +99,8 @@ namespace UniversalImageScaler.Models
             {
                 this.images.Add(image);
             }
+
+            this.UpdateGenerate();
         }
 
         public double GetScaledWidth(double scale)
@@ -107,6 +111,45 @@ namespace UniversalImageScaler.Models
         public double GetScaledHeight(double scale)
         {
             return Math.Ceiling(this.height * scale);
+        }
+
+        private void UpdateGenerate()
+        {
+            int trueCount = 0;
+            int falseCount = 0;
+
+            foreach (OutputImage image in this.Images)
+            {
+                if (image.Generate)
+                {
+                    trueCount++;
+                }
+                else
+                {
+                    falseCount++;
+                }
+            }
+
+            bool? generate = null;
+
+            if (trueCount > 0 && falseCount > 0)
+            {
+                // null
+            }
+            else if (trueCount > 0)
+            {
+                generate = true;
+            }
+            else if (falseCount > 0)
+            {
+                generate = false;
+            }
+            else
+            {
+                generate = false;
+            }
+
+            this.Generate = generate;
         }
     }
 }

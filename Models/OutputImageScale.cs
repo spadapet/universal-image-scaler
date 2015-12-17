@@ -1,4 +1,6 @@
-﻿namespace UniversalImageScaler.Models
+﻿using System;
+
+namespace UniversalImageScaler.Models
 {
     internal class OutputImageScale : OutputImage
     {
@@ -28,6 +30,14 @@
         public override string Path
         {
             get { return this.Owner.Owner.GetScaledPath(this.scale); }
+        }
+
+        public override string DisplayText
+        {
+            get
+            {
+                return "Foo";
+            }
         }
     }
 }

@@ -19,6 +19,17 @@
         <DataTemplate DataType="{x:Type models:OutputFeature}">
             <TextBlock Text="{Binding Name}" />
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type models:OutputSet}">
+            <StackPanel Orientation="Vertical">
+                <CheckBox IsChecked="{Binding Generate}" Content="{Binding Name}" IsThreeState="True" />
+                <ItemsControl ItemsSource="{Binding Images}" Margin="20,0,0,0" />
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type models:OutputImage}">
+            <CheckBox IsChecked="{Binding Generate}" Content="{Binding DisplayText}" />
+        </DataTemplate>
     </vsui:DialogWindow.Resources>
 
     <Grid>
@@ -45,6 +56,7 @@
                 <Run Text="What images would you like to create?" />
             </TextBlock>
             <ComboBox ItemsSource="{Binding Features}" SelectedItem="{Binding Feature}" HorizontalAlignment="Left" />
+            <ListBox ItemsSource="{Binding Feature.Sets}"></ListBox>
         </StackPanel>
         <Grid Grid.Row="1" Grid.IsSharedSizeScope="True" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>

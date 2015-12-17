@@ -3,7 +3,7 @@
     public abstract class OutputImage : ModelBase
     {
         private OutputSet owner;
-        private bool? generate;
+        private bool generate;
 
         public OutputImage(OutputSet owner)
         {
@@ -13,8 +13,9 @@
         public abstract double PixelWidth { get; }
         public abstract double PixelHeight { get; }
         public abstract string Path { get; }
+        public abstract string DisplayText { get; }
 
-        public bool? Generate
+        public bool Generate
         {
             get { return this.generate; }
             set

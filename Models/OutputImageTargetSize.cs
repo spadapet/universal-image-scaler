@@ -36,5 +36,13 @@
         {
             get { return this.Owner.Owner.GetTargetSizePath(this.targetSize, this.unplated); }
         }
+
+        public override string DisplayText
+        {
+            get
+            {
+                return "Bar";
+            }
+        }
     }
 }
