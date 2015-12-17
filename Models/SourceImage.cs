@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -11,7 +12,7 @@ using UniversalImageScaler.Utility;
 
 namespace UniversalImageScaler.Models
 {
-    internal class SourceImage : ModelBase
+    public class SourceImage : ModelBase
     {
         private VSITEMSELECTION item;
 
@@ -22,9 +23,16 @@ namespace UniversalImageScaler.Models
         private ImageFileType imageType;
         private double? scale;
         private ObservableCollection<OutputFeature> features;
+        private OutputFeature feature;
 
         public SourceImage()
         {
+            if (!WpfHelpers.IsDesignMode)
+            {
+                Debug.Fail("Only use this constructor in design mode");
+                return;
+            }
+
             this.path = @"x:\test\image.scale-400.png";
             this.pathScaleStart = 13;
             this.pathScaleLength = 11;
@@ -44,7 +52,7 @@ namespace UniversalImageScaler.Models
             this.image = image;
 
             OutputFeature feature = new OutputFeature("Test feature");
-            this.features.Add(feature);
+            this.AddFeature(feature);
 
             OutputSet set = new OutputSet(this, "Test image", 8, 8, true);
             feature.AddSet(set);
@@ -60,6 +68,11 @@ namespace UniversalImageScaler.Models
 
             output = new OutputImageTargetSize(set, 16, false);
             set.AddImage(output);
+
+            // Another feature for fun
+            feature = new OutputFeature("Another test feature");
+            feature.AddSet(set);
+            this.AddFeature(feature);
         }
 
         public SourceImage(VSITEMSELECTION item)
@@ -139,6 +152,32 @@ namespace UniversalImageScaler.Models
         public IEnumerable<OutputFeature> Features
         {
             get { return this.features; }
+        }
+
+        public OutputFeature Feature
+        {
+            get { return this.feature; }
+            set
+            {
+                if (this.feature != value)
+                {
+                    this.feature = value;
+                    this.OnPropertyChanged(nameof(this.Feature));
+                }
+            }
+        }
+
+        public void AddFeature(OutputFeature feature)
+        {
+            if (feature != null && !this.features.Contains(feature))
+            {
+                this.features.Add(feature);
+
+                if (this.Feature == null)
+                {
+                    this.Feature = feature;
+                }
+            }
         }
 
         public ImageFileType ImageType

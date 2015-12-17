@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace UniversalImageScaler.Models
 {
-    internal class OutputSet : ModelBase
+    public class OutputSet : ModelBase
     {
         private SourceImage owner;
         private string name;

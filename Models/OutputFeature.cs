@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace UniversalImageScaler.Models
 {
-    internal class OutputFeature : ModelBase
+    public class OutputFeature : ModelBase
     {
         private string name;
         private ObservableCollection<OutputSet> sets;

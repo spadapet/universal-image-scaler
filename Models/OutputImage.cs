@@ -1,6 +1,6 @@
 ﻿namespace UniversalImageScaler.Models
 {
-    internal abstract class OutputImage : ModelBase
+    public abstract class OutputImage : ModelBase
     {
         private OutputSet owner;
         private bool? generate;

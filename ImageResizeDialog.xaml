@@ -5,15 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:local="clr-namespace:UniversalImageScaler"
+        xmlns:models="clr-namespace:UniversalImageScaler.Models"
         xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
         mc:Ignorable="d"
         Title="Scaled image generator"
         ResizeMode="CanResizeWithGrip"
         Width="450"
         Height="500"
-        Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}">
+        Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"
+        d:DataContext="{d:DesignInstance Type=models:SourceImage, IsDesignTimeCreatable=True}">
 
     <vsui:DialogWindow.Resources>
+        <DataTemplate DataType="{x:Type models:OutputFeature}">
+            <TextBlock Text="{Binding Name}" />
+        </DataTemplate>
     </vsui:DialogWindow.Resources>
 
     <Grid>
@@ -34,9 +39,12 @@
                     Height="150"
                     Source="{Binding Image}" />
             </Border>
-            <TextBlock Margin="0,5,0,0">
-                <Run Text="Destination is " /><Run Text="{Binding FullDir, Mode=OneTime}" />
+            <TextBlock Margin="0,10">
+                <Run Text="The destination folder is: " /><Run Text="{Binding FullDir, Mode=OneTime}" />
+                <LineBreak />
+                <Run Text="What images would you like to create?" />
             </TextBlock>
+            <ComboBox ItemsSource="{Binding Features}" SelectedItem="{Binding Feature}" HorizontalAlignment="Left" />
         </StackPanel>
         <Grid Grid.Row="1" Grid.IsSharedSizeScope="True" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
