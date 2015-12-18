@@ -82,7 +82,7 @@ namespace UniversalImageScaler.Models
 
             InitSourcePathAndScale();
             InitSourceImage();
-            InitOutputSets();
+            InitFeatures();
         }
 
         private void InitSourcePathAndScale()
@@ -126,9 +126,59 @@ namespace UniversalImageScaler.Models
             this.image = ImageHelpers.LoadSourceImage(this.path);
         }
 
-        private void InitOutputSets()
+        private void InitFeatures()
         {
-            //this.images = new List<OutputImage>();
+            OutputFeature scaleFeature = this.InitScaleFeature();
+            OutputFeature squareFeature = this.InitSquareManifestFeature();
+            OutputFeature wideFeature = this.InitWideManifestFeature();
+
+            OutputFeature bothFeature = new OutputFeature("Square and Wide Manifest Images");
+            foreach (OutputSet set in squareFeature.Sets)
+            {
+                bothFeature.AddSet(set);
+            }
+
+            foreach (OutputSet set in wideFeature.Sets)
+            {
+                bothFeature.AddSet(set);
+            }
+
+            this.AddFeature(scaleFeature);
+            this.AddFeature(squareFeature);
+            this.AddFeature(wideFeature);
+            this.AddFeature(bothFeature);
+        }
+
+        private OutputFeature InitScaleFeature()
+        {
+            OutputFeature feature = new OutputFeature("Smaller Scales of Selected Image");
+            string setName = Path.GetFileName(this.UnscaledPath);
+            OutputSet set = null;
+
+            if (this.scale.HasValue)
+            {
+                double width = this.image.PixelWidth / this.scale.Value;
+                double height = this.image.PixelHeight / this.scale.Value;
+                set = new OutputSet(this, setName, width, height, true);
+
+                // TODO: Add images
+            }
+            else
+            {
+                set = new OutputSet(this, setName, this.image.PixelWidth / 4.0, this.image.PixelHeight / 4.0, false);
+
+                // TODO: Add images
+            }
+
+            feature.AddSet(set);
+            return feature;
+        }
+
+        private OutputFeature InitSquareManifestFeature()
+        {
+            OutputFeature feature = new OutputFeature("Square Manifest Images");
+
+            return feature;
 
             //if (this.sourceScale.HasValue)
             //{
@@ -147,6 +197,14 @@ namespace UniversalImageScaler.Models
             //        (int)(this.sourceImage.PixelWidth / this.sourceScale.Value),
             //        (int)(this.sourceImage.PixelHeight / this.sourceScale.Value)));
             //}
+
+        }
+
+        private OutputFeature InitWideManifestFeature()
+        {
+            OutputFeature feature = new OutputFeature("Wide Manifest Images");
+
+            return feature;
         }
 
         public IEnumerable<OutputFeature> Features
