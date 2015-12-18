@@ -10,8 +10,10 @@
         mc:Ignorable="d"
         Title="Scaled image generator"
         ResizeMode="CanResizeWithGrip"
-        Width="450"
+        Width="400"
         Height="500"
+        MinWidth="200"
+        MinHeight="375"
         Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"
         d:DataContext="{d:DesignInstance Type=models:SourceImage, IsDesignTimeCreatable=True}">
 
@@ -32,40 +34,40 @@
         </DataTemplate>
     </vsui:DialogWindow.Resources>
 
-    <Grid>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <StackPanel Margin="10" Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Left">
-            <TextBlock Text="{Binding FileName}" />
-            <Border
-                HorizontalAlignment="Left" 
-                Margin="0,5,0,0"
-                BorderThickness="1"
-                BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}">
-                <Image
-                    Stretch="Uniform"
-                    Width="150"
-                    Height="150"
-                    Source="{Binding Image}" />
-            </Border>
-            <TextBlock Margin="0,10">
-                <Run Text="The destination folder is: " /><Run Text="{Binding FullDir, Mode=OneTime}" />
-                <LineBreak />
-                <Run Text="What images would you like to create?" />
-            </TextBlock>
-            <ComboBox ItemsSource="{Binding Features}" SelectedItem="{Binding Feature}" HorizontalAlignment="Left" />
-            <ListBox ItemsSource="{Binding Feature.Sets}"></ListBox>
-        </StackPanel>
-        <Grid Grid.Row="1" Grid.IsSharedSizeScope="True" HorizontalAlignment="Right">
+        <DockPanel>
+            <StackPanel Margin="0,0,0,5" DockPanel.Dock="Top" Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Stretch">
+                <TextBlock Text="{Binding FileName}" />
+                <Border
+                    HorizontalAlignment="Left" 
+                    Margin="0,5,0,10"
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}">
+                    <Image
+                        Stretch="Uniform"
+                        Width="150"
+                        Height="150"
+                        Source="{Binding Image}" />
+                </Border>
+                <TextBlock Text="The destination folder is:" />
+                <TextBox Margin="5,5,0,5" Text="{Binding FullDir, Mode=OneTime}" IsReadOnly="True" Background="Transparent" BorderThickness="0" />
+                <TextBlock Text="What images would you like to create?" />
+                <ComboBox Margin="0,5,0,0" ItemsSource="{Binding Features}" SelectedItem="{Binding Feature}" />
+            </StackPanel>
+            <ListBox ItemsSource="{Binding Feature.Sets}" />
+        </DockPanel>
+        <Grid Margin="0,10,0,0" Grid.Row="1" Grid.IsSharedSizeScope="True" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" SharedSizeGroup="Buttons" />
                 <ColumnDefinition Width="Auto" SharedSizeGroup="Buttons" />
             </Grid.ColumnDefinitions>
             <Grid.Resources>
                 <Style TargetType="Button">
-                    <Setter Property="Margin" Value="5" />
+                    <Setter Property="Margin" Value="10,0,0,0" />
                     <Setter Property="Padding" Value="10,1" />
                 </Style>
             </Grid.Resources>

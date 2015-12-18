@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace UniversalImageScaler.Models
 {
@@ -75,18 +76,25 @@ namespace UniversalImageScaler.Models
             }
         }
 
-        private bool? Generate
+        public bool? Generate
         {
             get { return this.generate; }
-            set
+            set { this.SetGenerate(value, true); }
+        }
+
+        private void SetGenerate(bool? value, bool updateImages)
+        {
+            if (this.generate != value)
             {
-                if (this.generate != value)
+                this.generate = value;
+                this.OnPropertyChanged(nameof(this.Generate));
+
+                if (updateImages)
                 {
-                    this.generate = value;
-                    this.OnPropertyChanged(nameof(this.Generate));
+                    this.UpdateImageGenerate();
                 }
             }
-        }
+        } 
 
         public IEnumerable<OutputImage> Images
         {
@@ -98,6 +106,8 @@ namespace UniversalImageScaler.Models
             if (image != null && !this.images.Contains(image))
             {
                 this.images.Add(image);
+
+                image.PropertyChanged += OnImagePropertyChanged;
             }
 
             this.UpdateGenerate();
@@ -111,6 +121,14 @@ namespace UniversalImageScaler.Models
         public double GetScaledHeight(double scale)
         {
             return Math.Ceiling(this.height * scale);
+        }
+
+        private void OnImagePropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(OutputImage.Generate))
+            {
+                UpdateGenerate();
+            }
         }
 
         private void UpdateGenerate()
@@ -149,7 +167,20 @@ namespace UniversalImageScaler.Models
                 generate = false;
             }
 
-            this.Generate = generate;
+            this.SetGenerate(generate, false);
+        }
+
+        private void UpdateImageGenerate()
+        {
+            if (this.Generate.HasValue)
+            {
+                foreach (OutputImage image in this.Images)
+                {
+                    image.PropertyChanged -= this.OnImagePropertyChanged;
+                    image.Generate = this.Generate.Value;
+                    image.PropertyChanged += this.OnImagePropertyChanged;
+                }
+            }
         }
     }
 }
