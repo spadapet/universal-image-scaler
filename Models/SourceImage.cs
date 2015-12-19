@@ -1,13 +1,10 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.Shell.Interop;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Microsoft.VisualStudio.Shell.Interop;
 using UniversalImageScaler.Utility;
 
 namespace UniversalImageScaler.Models
@@ -29,50 +26,18 @@ namespace UniversalImageScaler.Models
         {
             if (!WpfHelpers.IsDesignMode)
             {
-                Debug.Fail("Only use this constructor in design mode");
-                return;
+                throw new InvalidOperationException("Must create SourceImage with a selected image");
             }
 
             this.path = @"x:\test\image.scale-400.png";
             this.pathScaleStart = 13;
             this.pathScaleLength = 11;
+            this.image = OutputHelpers.CreateDesignTimeSourceImage();
             this.imageType = ImageFileType.Png;
             this.scale = 400;
             this.features = new ObservableCollection<OutputFeature>();
 
-            byte[] bytes = new byte[32 * 32 * 4];
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                bytes[i] = 255;
-            }
-
-            WriteableBitmap image = new WriteableBitmap(32, 32, 96, 96, PixelFormats.Bgra32, null);
-            image.WritePixels(new Int32Rect(0, 0, 32, 32), bytes, 32 * 4, 0);
-            image.Freeze();
-            this.image = image;
-
-            OutputFeature feature = new OutputFeature("Test feature");
-            this.AddFeature(feature);
-
-            OutputSet set = new OutputSet(this, "Test image", 8, 8, true);
-            feature.AddSet(set);
-
-            OutputImage output = new OutputImageScale(set, 200);
-            set.AddImage(output);
-
-            output = new OutputImageScale(set, 100);
-            set.AddImage(output);
-
-            output = new OutputImageTargetSize(set, 16, true);
-            set.AddImage(output);
-
-            output = new OutputImageTargetSize(set, 16, false);
-            set.AddImage(output);
-
-            // Another feature for fun
-            feature = new OutputFeature("Another test feature");
-            feature.AddSet(set);
-            this.AddFeature(feature);
+            OutputHelpers.PopulateDesignTimeFeatures(this);
         }
 
         public SourceImage(VSITEMSELECTION item)
@@ -82,7 +47,8 @@ namespace UniversalImageScaler.Models
 
             InitSourcePathAndScale();
             InitSourceImage();
-            InitFeatures();
+
+            OutputHelpers.PopulateFeatures(this);
         }
 
         private void InitSourcePathAndScale()
@@ -126,87 +92,6 @@ namespace UniversalImageScaler.Models
             this.image = ImageHelpers.LoadSourceImage(this.path);
         }
 
-        private void InitFeatures()
-        {
-            OutputFeature scaleFeature = this.InitScaleFeature();
-            OutputFeature squareFeature = this.InitSquareManifestFeature();
-            OutputFeature wideFeature = this.InitWideManifestFeature();
-
-            OutputFeature bothFeature = new OutputFeature("Square and Wide Manifest Images");
-            foreach (OutputSet set in squareFeature.Sets)
-            {
-                bothFeature.AddSet(set);
-            }
-
-            foreach (OutputSet set in wideFeature.Sets)
-            {
-                bothFeature.AddSet(set);
-            }
-
-            this.AddFeature(scaleFeature);
-            this.AddFeature(squareFeature);
-            this.AddFeature(wideFeature);
-            this.AddFeature(bothFeature);
-        }
-
-        private OutputFeature InitScaleFeature()
-        {
-            OutputFeature feature = new OutputFeature("Smaller Scales of Selected Image");
-            string setName = Path.GetFileName(this.UnscaledPath);
-            OutputSet set = null;
-
-            if (this.scale.HasValue)
-            {
-                double width = this.image.PixelWidth / this.scale.Value;
-                double height = this.image.PixelHeight / this.scale.Value;
-                set = new OutputSet(this, setName, width, height, true);
-
-                // TODO: Add images
-            }
-            else
-            {
-                set = new OutputSet(this, setName, this.image.PixelWidth / 4.0, this.image.PixelHeight / 4.0, false);
-
-                // TODO: Add images
-            }
-
-            feature.AddSet(set);
-            return feature;
-        }
-
-        private OutputFeature InitSquareManifestFeature()
-        {
-            OutputFeature feature = new OutputFeature("Square Manifest Images");
-
-            return feature;
-
-            //if (this.sourceScale.HasValue)
-            //{
-            //    this.images.Add(new OutputImage(this, "Square 71x71 Logo", 71, 71));
-            //    this.images.Add(new OutputImage(this, "Square 150x150 Logo", 150, 150));
-            //    this.images.Add(new OutputImage(this, "Wide 310x150 Logo", 310, 150));
-            //    this.images.Add(new OutputImage(this, "Square 310x310 Logo", 310, 310));
-            //    this.images.Add(new OutputImage(this, "Square 44x44 Logo", 44, 44, 256, 48, 24, 16));
-            //    this.images.Add(new OutputImage(this, "Store Logo", 50, 50));
-            //    this.images.Add(new OutputImage(this, "Badge Logo", 24, 24) { TransformType = ImageTransformType.WhiteOnly });
-            //    this.images.Add(new OutputImage(this, "Splash Screen", 620, 300));
-            //}
-            //else
-            //{
-            //    this.images.Add(new OutputImage(this, this.FileName,
-            //        (int)(this.sourceImage.PixelWidth / this.sourceScale.Value),
-            //        (int)(this.sourceImage.PixelHeight / this.sourceScale.Value)));
-            //}
-
-        }
-
-        private OutputFeature InitWideManifestFeature()
-        {
-            OutputFeature feature = new OutputFeature("Wide Manifest Images");
-
-            return feature;
-        }
-
         public IEnumerable<OutputFeature> Features
         {
             get { return this.features; }
@@ -246,6 +131,21 @@ namespace UniversalImageScaler.Models
         public BitmapSource Image
         {
             get { return this.image; }
+        }
+
+        public double? Scale
+        {
+            get { return this.scale; }
+        }
+
+        public double ImagePixelWidth
+        {
+            get { return this.image != null ? this.image.PixelWidth : 0; }
+        }
+
+        public double ImagePixelHeight
+        {
+            get { return this.image != null ? this.image.PixelHeight : 0; }
         }
 
         public string FileName

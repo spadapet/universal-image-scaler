@@ -60,6 +60,7 @@
     <Compile Include="ImageResizePackage.cs" />
     <Compile Include="Models\OutputImageTargetSize.cs" />
     <Compile Include="Utility\DteHelpers.cs" />
+    <Compile Include="Utility\OutputHelpers.cs" />
     <Compile Include="Utility\ImageHelpers.cs" />
     <Compile Include="Models\ModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
