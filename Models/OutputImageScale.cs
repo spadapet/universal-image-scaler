@@ -36,8 +36,32 @@ namespace UniversalImageScaler.Models
         {
             get
             {
-                return "Foo";
+                string text = $"Scale {(int)(this.scale * 100.0)}, {this.PixelWidth}x{this.PixelHeight}px";
+                if (this.IsOptional)
+                {
+                    text += " (optional)";
+                }
+
+                return text;
             }
+        }
+
+        protected override bool ShouldEnable
+        {
+            get
+            {
+                double width = this.scale * this.Owner.Width;
+                double height = this.scale * this.Owner.Height;
+
+                return base.ShouldEnable &&
+                    this.Image.PixelWidth >= width &&
+                    this.Image.PixelHeight >= height;
+            }
+        }
+
+        protected virtual bool IsOptional
+        {
+            get { return false; }
         }
     }
 }

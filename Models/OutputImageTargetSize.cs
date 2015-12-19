@@ -41,7 +41,23 @@
         {
             get
             {
-                return "Bar";
+                string text = $"Target size {this.PixelWidth}x{this.PixelHeight}px";
+                if (this.unplated)
+                {
+                    text += ", unplated";
+                }
+
+                return text;
+            }
+        }
+
+        protected override bool ShouldEnable
+        {
+            get
+            {
+                return base.ShouldEnable &&
+                    this.Image.PixelWidth >= this.targetSize &&
+                    this.Image.PixelHeight >= targetSize;
             }
         }
     }

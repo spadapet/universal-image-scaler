@@ -21,6 +21,8 @@ namespace UniversalImageScaler.Models
         private double? scale;
         private ObservableCollection<OutputFeature> features;
         private OutputFeature feature;
+        private bool showOptionalScales8;
+        private bool showOptionalScales10;
 
         public SourceImage()
         {
@@ -38,6 +40,7 @@ namespace UniversalImageScaler.Models
             this.features = new ObservableCollection<OutputFeature>();
 
             OutputHelpers.PopulateDesignTimeFeatures(this);
+            this.PostInitialize();
         }
 
         public SourceImage(VSITEMSELECTION item)
@@ -49,6 +52,15 @@ namespace UniversalImageScaler.Models
             InitSourceImage();
 
             OutputHelpers.PopulateFeatures(this);
+            this.PostInitialize();
+        }
+
+        public void PostInitialize()
+        {
+            foreach (OutputFeature feature in this.features)
+            {
+                feature.Initialize();
+            }
         }
 
         private void InitSourcePathAndScale()
@@ -138,12 +150,12 @@ namespace UniversalImageScaler.Models
             get { return this.scale; }
         }
 
-        public double ImagePixelWidth
+        public double PixelWidth
         {
             get { return this.image != null ? this.image.PixelWidth : 0; }
         }
 
-        public double ImagePixelHeight
+        public double PixelHeight
         {
             get { return this.image != null ? this.image.PixelHeight : 0; }
         }
@@ -196,6 +208,32 @@ namespace UniversalImageScaler.Models
         public string FullPath
         {
             get { return this.path; }
+        }
+
+        public bool ShowOptionalScales8
+        {
+            get { return this.showOptionalScales8; }
+            set
+            {
+                if (this.showOptionalScales8 != value)
+                {
+                    this.showOptionalScales8 = value;
+                    this.OnPropertyChanged(nameof(this.ShowOptionalScales8));
+                }
+            }
+        }
+
+        public bool ShowOptionalScales10
+        {
+            get { return this.showOptionalScales10; }
+            set
+            {
+                if (this.showOptionalScales10 != value)
+                {
+                    this.showOptionalScales10 = value;
+                    this.OnPropertyChanged(nameof(this.ShowOptionalScales10));
+                }
+            }
         }
     }
 }

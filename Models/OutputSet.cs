@@ -9,6 +9,7 @@ namespace UniversalImageScaler.Models
     {
         private SourceImage owner;
         private string name;
+        private string description;
         private double width;
         private double height;
         private bool fixedSize;
@@ -19,12 +20,22 @@ namespace UniversalImageScaler.Models
         {
             this.owner = owner;
             this.name = name;
+            this.description = string.Empty;
             this.width = width;
             this.height = height;
             this.fixedSize = fixedSize;
             this.images = new ObservableCollection<OutputImage>();
+        }
+
+        public void Initialize()
+        {
+            foreach (OutputImage image in this.images)
+            {
+                image.Initialize();
+            }
 
             this.UpdateGenerate();
+            this.UpdateImageGenerate();
         }
 
         public SourceImage Owner
@@ -37,12 +48,25 @@ namespace UniversalImageScaler.Models
             get { return this.name; }
         }
 
+        public string Tooltip
+        {
+            get { return this.description; }
+            set
+            {
+                if (this.description != value)
+                {
+                    this.description = value;
+                    this.OnPropertyChanged(nameof(this.Tooltip));
+                }
+            }
+        }
+
         public double Width
         {
             get { return this.width; }
             set
             {
-                if (this.width != value)
+                if (!this.fixedSize && this.width != value)
                 {
                     this.width = value;
                     this.OnPropertyChanged(nameof(this.Width));
@@ -55,7 +79,7 @@ namespace UniversalImageScaler.Models
             get { return this.height; }
             set
             {
-                if (this.height != value)
+                if (!this.fixedSize && this.height != value)
                 {
                     this.height = value;
                     this.OnPropertyChanged(nameof(this.Height));
@@ -94,7 +118,7 @@ namespace UniversalImageScaler.Models
                     this.UpdateImageGenerate();
                 }
             }
-        } 
+        }
 
         public IEnumerable<OutputImage> Images
         {
@@ -109,8 +133,6 @@ namespace UniversalImageScaler.Models
 
                 image.PropertyChanged += OnImagePropertyChanged;
             }
-
-            this.UpdateGenerate();
         }
 
         public double GetScaledWidth(double scale)
@@ -127,7 +149,7 @@ namespace UniversalImageScaler.Models
         {
             if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(OutputImage.Generate))
             {
-                UpdateGenerate();
+                this.UpdateGenerate();
             }
         }
 

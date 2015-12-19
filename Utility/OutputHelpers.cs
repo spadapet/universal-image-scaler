@@ -27,13 +27,13 @@ namespace UniversalImageScaler.Utility
             OutputFeature feature = new OutputFeature("Test feature");
             image.AddFeature(feature);
 
-            OutputSet set = new OutputSet(this, "Test image", 8, 8, true);
+            OutputSet set = new OutputSet(image, "Test image", 8, 8, true);
             feature.AddSet(set);
 
-            OutputImage output = new OutputImageScale(set, 200);
+            OutputImage output = new OutputImageScale(set, 2);
             set.AddImage(output);
 
-            output = new OutputImageScale(set, 100);
+            output = new OutputImageScale(set, 1);
             set.AddImage(output);
 
             output = new OutputImageTargetSize(set, 16, true);
@@ -41,6 +41,9 @@ namespace UniversalImageScaler.Utility
 
             output = new OutputImageTargetSize(set, 16, false);
             set.AddImage(output);
+
+            set = new OutputSet(image, "Test image 2", 16, 16, false);
+            feature.AddSet(set);
 
             // Another feature for fun
             feature = new OutputFeature("Another test feature");
@@ -50,19 +53,24 @@ namespace UniversalImageScaler.Utility
 
         public static void PopulateFeatures(SourceImage image)
         {
-            OutputFeature scaleFeature = OutputHelpers.InitScaleFeature();
+            OutputFeature scaleFeature = OutputHelpers.InitScaleFeature(image);
             OutputFeature squareFeature = OutputHelpers.InitSquareManifestFeature();
             OutputFeature wideFeature = OutputHelpers.InitWideManifestFeature();
+            OutputFeature bothFeature = null;
 
-            OutputFeature bothFeature = new OutputFeature("Square and Wide Manifest Images");
-            foreach (OutputSet set in squareFeature.Sets)
+            if (squareFeature != null && wideFeature != null)
             {
-                bothFeature.AddSet(set);
-            }
+                bothFeature = new OutputFeature("Square and Wide Manifest Images");
 
-            foreach (OutputSet set in wideFeature.Sets)
-            {
-                bothFeature.AddSet(set);
+                foreach (OutputSet set in squareFeature.Sets)
+                {
+                    bothFeature.AddSet(set);
+                }
+
+                foreach (OutputSet set in wideFeature.Sets)
+                {
+                    bothFeature.AddSet(set);
+                }
             }
 
             image.AddFeature(scaleFeature);
@@ -79,16 +87,16 @@ namespace UniversalImageScaler.Utility
 
             if (image.Scale.HasValue)
             {
-                double width = image.ImagePixelWidth / image.Scale.Value;
-                double height = image.ImagePixelHeight / image.Scale.Value;
+                double width = image.PixelWidth / image.Scale.Value;
+                double height = image.PixelHeight / image.Scale.Value;
                 set = new OutputSet(image, setName, width, height, true);
 
                 // TODO: Add images
             }
             else
             {
-                double width = image.ImagePixelWidth / 4.0;
-                double height = image.ImagePixelHeight / 4.0;
+                double width = image.PixelWidth / 4.0;
+                double height = image.PixelHeight / 4.0;
                 set = new OutputSet(image, setName, width, height, false);
 
                 // TODO: Add images

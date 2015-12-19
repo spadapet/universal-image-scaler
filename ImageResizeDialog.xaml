@@ -1,42 +1,45 @@
-﻿<vsui:DialogWindow x:Class="UniversalImageScaler.ImageResizeDialog"
-        x:ClassModifier="internal"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-        xmlns:local="clr-namespace:UniversalImageScaler"
-        xmlns:models="clr-namespace:UniversalImageScaler.Models"
-        xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
-        mc:Ignorable="d"
-        Title="Scaled image generator"
-        ResizeMode="CanResizeWithGrip"
-        Width="400"
-        Height="500"
-        MinWidth="200"
-        MinHeight="375"
-        Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"
-        d:DataContext="{d:DesignInstance Type=models:SourceImage, IsDesignTimeCreatable=True}">
+﻿<vsui:DialogWindow
+    x:Class="UniversalImageScaler.ImageResizeDialog"
+    x:ClassModifier="internal"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:UniversalImageScaler"
+    xmlns:models="clr-namespace:UniversalImageScaler.Models"
+    xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
+    mc:Ignorable="d"
+    Title="Scaled image generator"
+    ResizeMode="CanResizeWithGrip"
+    Width="400"
+    Height="500"
+    MinWidth="200"
+    MinHeight="375"
+    Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"
+    d:DataContext="{d:DesignInstance Type=models:SourceImage, IsDesignTimeCreatable=True}">
 
     <vsui:DialogWindow.Resources>
         <DataTemplate DataType="{x:Type models:OutputFeature}">
-            <TextBlock Text="{Binding Name}" />
+            <TextBlock Text="{Binding Name}" ToolTip="{Binding Tooltip}" />
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type models:OutputSet}">
             <StackPanel Orientation="Vertical">
-                <CheckBox IsChecked="{Binding Generate}" Content="{Binding Name}" IsThreeState="True" />
+                <CheckBox IsChecked="{Binding Generate}" Content="{Binding Name}" IsThreeState="True" ToolTip="{Binding Tooltip}" />
                 <ItemsControl ItemsSource="{Binding Images}" Margin="20,0,0,0" />
             </StackPanel>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type models:OutputImage}">
-            <CheckBox IsChecked="{Binding Generate}" Content="{Binding DisplayText}" IsThreeState="False" />
+            <CheckBox IsChecked="{Binding Generate}" Content="{Binding DisplayText}" IsThreeState="False" ToolTip="{Binding Tooltip}" />
         </DataTemplate>
     </vsui:DialogWindow.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <DockPanel>
@@ -60,7 +63,9 @@
             </StackPanel>
             <ListBox ItemsSource="{Binding Feature.Sets}" />
         </DockPanel>
-        <Grid Margin="0,10,0,0" Grid.Row="1" Grid.IsSharedSizeScope="True" HorizontalAlignment="Right">
+        <CheckBox Grid.Row="1" Margin="0,5,0,0" Content="Include optional Windows 10 scales" IsChecked="{Binding ShowOptionalScales10}" />
+        <CheckBox Grid.Row="2" Margin="0,5,0,0" Content="Include optional Windows 8 scales" IsChecked="{Binding ShowOptionalScales8}" />
+        <Grid Margin="0,10,0,0" Grid.Row="3" Grid.IsSharedSizeScope="True" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" SharedSizeGroup="Buttons" />
                 <ColumnDefinition Width="Auto" SharedSizeGroup="Buttons" />
