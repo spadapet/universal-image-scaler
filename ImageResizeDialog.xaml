@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:UniversalImageScaler"
     xmlns:models="clr-namespace:UniversalImageScaler.Models"
+    xmlns:utility="clr-namespace:UniversalImageScaler.Utility"
     xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
     mc:Ignorable="d"
     Title="Scaled image generator"
@@ -20,6 +21,7 @@
 
     <vsui:DialogWindow.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisible" />
+        <utility:BooleanToCollapsedConverter x:Key="BoolToCollapsed" />
 
         <DataTemplate DataType="{x:Type models:OutputFeature}">
             <TextBlock Text="{Binding Name}" ToolTip="{Binding Tooltip}" />
@@ -28,7 +30,7 @@
         <DataTemplate DataType="{x:Type models:OutputSet}">
             <StackPanel Orientation="Vertical">
                 <CheckBox IsChecked="{Binding Generate}" Content="{Binding Name}" ToolTip="{Binding Tooltip}" />
-                <ItemsControl ItemsSource="{Binding Images}" Margin="20,0,0,0" />
+                <ItemsControl Focusable="False" ItemsSource="{Binding Images}" Margin="20,0,0,0" />
             </StackPanel>
         </DataTemplate>
 
@@ -52,12 +54,12 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Orientation="Vertical">
-                        <TextBox Text="{Binding FileName, Mode=OneWay}" BorderThickness="0" Background="Transparent" IsReadOnly="True" />
+                        <TextBox IsTabStop="False" Text="{Binding FileName, Mode=OneWay}" BorderThickness="0" Background="Transparent" IsReadOnly="True" />
                         <Border
                             HorizontalAlignment="Left"
                             Margin="0,5,0,10"
                             BorderThickness="1"
-                            BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}">
+                            BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
                             <Image
                                 Stretch="Uniform"
                                 Width="150"
@@ -71,19 +73,29 @@
                             <Run Text="{Binding PixelWidth, Mode=OneWay}" /><Run Text="px x " />
                             <Run Text="{Binding PixelHeight, Mode=OneWay}" /><Run Text="px" />
                         </TextBlock>
-                        <TextBlock Margin="0,5,0,0" Text="Source image scale:" />
-                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                        <TextBlock Margin="0,5,0,0" Text="Source image scale:" Visibility="{Binding Feature.AllowChangeScale, Converter={StaticResource BoolToCollapsed}}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0" Visibility="{Binding Feature.AllowChangeScale, Converter={StaticResource BoolToCollapsed}}">
                             <TextBox Width="50" HorizontalAlignment="Left" IsReadOnly="{Binding ScaleReadOnly}" Text="{Binding Scale100, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock VerticalAlignment="Center" Text="%" Margin="2,0,0,0" />
                         </StackPanel>
                     </StackPanel>
                 </Grid>
                 <TextBlock Text="The destination folder is:" />
-                <TextBox Margin="5,5,0,5" Text="{Binding FullDir, Mode=OneTime}" IsReadOnly="True" Background="Transparent" BorderThickness="0" />
+                <TextBox Margin="5,5,0,5" IsTabStop="False" Text="{Binding FullDir, Mode=OneTime}" IsReadOnly="True" Background="Transparent" BorderThickness="0" />
                 <TextBlock Text="What images would you like to create?" />
                 <ComboBox Margin="0,5,0,0" ItemsSource="{Binding Features}" SelectedItem="{Binding Feature}" />
             </StackPanel>
-            <ListBox ItemsSource="{Binding Feature.Sets}" />
+            <Border
+                BorderThickness="1"
+                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+                Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
+                <ScrollViewer
+                    Padding="5"
+                    HorizontalScrollBarVisibility="Auto"
+                    VerticalScrollBarVisibility="Auto">
+                    <ItemsControl Focusable="False" ItemsSource="{Binding Feature.Sets}" />
+                </ScrollViewer>
+            </Border>
         </DockPanel>
         <CheckBox Grid.Row="1" Margin="0,5,0,0" Content="Include optional Windows 10 scales" IsChecked="{Binding ShowOptionalScales10}" />
         <CheckBox Grid.Row="2" Margin="0,5,0,0" Content="Include optional Windows 8 scales" IsChecked="{Binding ShowOptionalScales8}" />

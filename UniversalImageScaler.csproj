@@ -61,6 +61,7 @@
     <Compile Include="Models\SourceImage.cs" />
     <Compile Include="ImageResizePackage.cs" />
     <Compile Include="Models\OutputImageTargetSize.cs" />
+    <Compile Include="Utility\BooleanToCollapsedConverter.cs" />
     <Compile Include="Utility\DteHelpers.cs" />
     <Compile Include="Utility\OutputHelpers.cs" />
     <Compile Include="Utility\ImageHelpers.cs" />

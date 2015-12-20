@@ -55,9 +55,7 @@
         {
             get
             {
-                return base.ShouldEnable &&
-                    this.Image.PixelWidth >= this.targetSize &&
-                    this.Image.PixelHeight >= targetSize;
+                return base.ShouldEnable && (this.Image.PixelWidth >= this.targetSize || this.Image.PixelHeight >= targetSize);
             }
         }
     }

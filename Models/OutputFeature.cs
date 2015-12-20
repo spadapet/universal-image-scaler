@@ -32,7 +32,7 @@ namespace UniversalImageScaler.Models
 
         public string Tooltip
         {
-            get { return this.description; }
+            get { return !string.IsNullOrEmpty(this.description) ? this.description : null; }
             set
             {
                 if (this.description != value)

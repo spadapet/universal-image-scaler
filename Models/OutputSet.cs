@@ -68,7 +68,7 @@ namespace UniversalImageScaler.Models
 
         public string Tooltip
         {
-            get { return this.description; }
+            get { return !string.IsNullOrEmpty(this.description) ? this.description : null; }
             set
             {
                 if (this.description != value)
@@ -176,14 +176,6 @@ namespace UniversalImageScaler.Models
             return Math.Ceiling(this.height * scale);
         }
 
-        private void OnImagePropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(OutputImage.Generate))
-            {
-                this.UpdateGenerate();
-            }
-        }
-
         private void UpdateGenerate()
         {
             int trueCount = 0;
@@ -191,13 +183,16 @@ namespace UniversalImageScaler.Models
 
             foreach (OutputImage image in this.Images)
             {
-                if (image.Generate)
+                if (image.Enabled)
                 {
-                    trueCount++;
-                }
-                else
-                {
-                    falseCount++;
+                    if (image.Generate)
+                    {
+                        trueCount++;
+                    }
+                    else
+                    {
+                        falseCount++;
+                    }
                 }
             }
 
@@ -236,12 +231,24 @@ namespace UniversalImageScaler.Models
             }
         }
 
+        private void OnImagePropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (string.IsNullOrEmpty(args.PropertyName) ||
+                args.PropertyName == nameof(OutputImage.Generate) ||
+                args.PropertyName == nameof(OutputImage.Enabled))
+            {
+                this.UpdateGenerate();
+            }
+        }
+
         private void OnOwnerPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             if (!this.FixedSize)
             {
                 this.UpdateSize();
             }
+
+            this.UpdateGenerate();
         }
 
         private void UpdateSize()

@@ -54,9 +54,7 @@ namespace UniversalImageScaler.Models
                 double width = this.scale * this.Owner.Width;
                 double height = this.scale * this.Owner.Height;
 
-                return base.ShouldEnable &&
-                    this.Image.PixelWidth >= width &&
-                    this.Image.PixelHeight >= height;
+                return base.ShouldEnable && (this.Image.PixelWidth >= width || this.Image.PixelHeight >= height);
             }
         }
 

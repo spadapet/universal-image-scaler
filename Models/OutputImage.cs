@@ -27,7 +27,7 @@ namespace UniversalImageScaler.Models
 
         public virtual string Tooltip
         {
-            get { return string.Empty; }
+            get { return null; }
         }
 
         public bool Generate
