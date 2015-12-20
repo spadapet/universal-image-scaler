@@ -22,6 +22,7 @@
     <vsui:DialogWindow.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisible" />
         <utility:BooleanToCollapsedConverter x:Key="BoolToCollapsed" />
+        <utility:InverseBooleanConverter x:Key="BoolInverse" />
 
         <DataTemplate DataType="{x:Type models:OutputFeature}">
             <TextBlock Text="{Binding Name}" ToolTip="{Binding Tooltip}" />
@@ -54,7 +55,12 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Orientation="Vertical">
-                        <TextBox IsTabStop="False" Text="{Binding FileName, Mode=OneWay}" BorderThickness="0" Background="Transparent" IsReadOnly="True" />
+                        <TextBox
+                            IsTabStop="False"
+                            Text="{Binding FileName, Mode=OneWay}"
+                            BorderThickness="0"
+                            Background="Transparent"
+                            IsReadOnly="True" />
                         <Border
                             HorizontalAlignment="Left"
                             Margin="0,5,0,10"
@@ -73,9 +79,19 @@
                             <Run Text="{Binding PixelWidth, Mode=OneWay}" /><Run Text="px x " />
                             <Run Text="{Binding PixelHeight, Mode=OneWay}" /><Run Text="px" />
                         </TextBlock>
-                        <TextBlock Margin="0,5,0,0" Text="Source image scale:" Visibility="{Binding Feature.AllowChangeScale, Converter={StaticResource BoolToCollapsed}}" />
-                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0" Visibility="{Binding Feature.AllowChangeScale, Converter={StaticResource BoolToCollapsed}}">
-                            <TextBox Width="50" HorizontalAlignment="Left" IsReadOnly="{Binding ScaleReadOnly}" Text="{Binding Scale100, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock
+                            Margin="0,5,0,0"
+                            Text="Source image scale:"
+                            Visibility="{Binding Feature.AllowChangeScale, Converter={StaticResource BoolToCollapsed}}" />
+                        <StackPanel
+                            Orientation="Horizontal"
+                            Margin="0,5,0,0"
+                            Visibility="{Binding Feature.AllowChangeScale, Converter={StaticResource BoolToCollapsed}}">
+                            <TextBox
+                                Width="50"
+                                HorizontalAlignment="Left"
+                                IsEnabled="{Binding ScaleReadOnly, Converter={StaticResource BoolInverse}}"
+                                Text="{Binding Scale100, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock VerticalAlignment="Center" Text="%" Margin="2,0,0,0" />
                         </StackPanel>
                     </StackPanel>
