@@ -29,7 +29,7 @@ namespace UniversalImageScaler.Utility
             OutputFeature feature = new OutputFeature("Test feature") { AllowChangeScale = true };
             image.AddFeature(feature);
 
-            OutputSet set = new OutputSet(image, "Test image", 8, 8, true);
+            OutputSet set = new OutputSet(image, "Test image", 8, 8);
             feature.AddSet(set);
 
             OutputImage output = new OutputImageScale(set, 2);
@@ -44,7 +44,7 @@ namespace UniversalImageScaler.Utility
             output = new OutputImageTargetSize(set, 16, false);
             set.AddImage(output);
 
-            set = new OutputSet(image, "Test image 2", 16, 16, false);
+            set = new OutputSet(image, "Test image 2", 16, 16);
             feature.AddSet(set);
 
             // Another feature for fun
@@ -85,11 +85,9 @@ namespace UniversalImageScaler.Utility
         {
             OutputFeature feature = new OutputFeature("Smaller Scales of Selected Image");
             string setName = Path.GetFileName(source.UnscaledPath);
-            double width = source.PixelWidth / source.Scale;
-            double height = source.PixelHeight / source.Scale;
-            OutputSet set = new OutputSet(source, setName, width, height, true);
+            OutputSet set = new OutputSet(source, setName);
 
-            foreach (OutputImage image in OutputHelpers.CreateOutputImages(set))
+            foreach (OutputImage image in OutputHelpers.CreateOutputImages(set, false))
             {
                 set.AddImage(image);
             }
@@ -103,22 +101,17 @@ namespace UniversalImageScaler.Utility
             OutputFeature feature = new OutputFeature("Square Manifest Images");
             OutputSet[] sets = new OutputSet[]
             {
-                new OutputSet(source, "Square 71x71 Logo", 71, 71, true),
-                new OutputSet(source, "Square 150x150 Logo", 150, 150, true),
-                new OutputSet(source, "Square 310x310 Logo", 310, 310, true),
-                new OutputSet(source, "Square 44x44 Logo", 44, 44, true),
-                new OutputSet(source, "Store Logo", 50, 50, true),
-                new OutputSet(source, "Badge Logo", 24, 24, true) { TransformType = ImageTransformType.WhiteOnly },
+                new OutputSet(source, "Square 71x71 Logo", 71, 71),
+                new OutputSet(source, "Square 150x150 Logo", 150, 150),
+                new OutputSet(source, "Square 310x310 Logo", 310, 310),
+                new OutputSet(source, "Square 44x44 Logo", 44, 44),
+                new OutputSet(source, "Store Logo", 50, 50),
+                new OutputSet(source, "Badge Logo", 24, 24) { TransformType = ImageTransformType.WhiteOnly },
             };
 
             foreach (OutputSet set in sets)
             {
-                foreach (OutputImage image in OutputHelpers.CreateOutputImages(set))
-                {
-                    set.AddImage(image);
-                }
-
-                foreach (OutputImage image in OutputHelpers.CreateOutputTargetSizeImages(set))
+                foreach (OutputImage image in OutputHelpers.CreateOutputImages(set, true))
                 {
                     set.AddImage(image);
                 }
@@ -134,18 +127,13 @@ namespace UniversalImageScaler.Utility
             OutputFeature feature = new OutputFeature("Wide Manifest Images");
             OutputSet[] sets = new OutputSet[]
             {
-                new OutputSet(source, "Wide 310x150 Logo", 310, 150, true),
-                new OutputSet(source, "Splash Screen", 620, 300, true),
+                new OutputSet(source, "Wide 310x150 Logo", 310, 150),
+                new OutputSet(source, "Splash Screen", 620, 300),
             };
 
             foreach (OutputSet set in sets)
             {
-                foreach (OutputImage image in OutputHelpers.CreateOutputImages(set))
-                {
-                    set.AddImage(image);
-                }
-
-                foreach (OutputImage image in OutputHelpers.CreateOutputTargetSizeImages(set))
+                foreach (OutputImage image in OutputHelpers.CreateOutputImages(set, true))
                 {
                     set.AddImage(image);
                 }
@@ -156,7 +144,7 @@ namespace UniversalImageScaler.Utility
             return feature;
         }
 
-        private static IEnumerable<OutputImage> CreateOutputImages(OutputSet set)
+        private static IEnumerable<OutputImage> CreateOutputImages(OutputSet set, bool manifestImage)
         {
             yield return new OutputImageScale(set, 4);
             yield return new OutputImageScale(set, 2);
@@ -165,18 +153,18 @@ namespace UniversalImageScaler.Utility
             yield return new OutputImageScaleOptional8(set, 1.4);
             yield return new OutputImageScaleOptional10(set, 1.25);
             yield return new OutputImageScale(set, 1);
-        }
 
-        private static IEnumerable<OutputImage> CreateOutputTargetSizeImages(OutputSet set)
-        {
-            yield return new OutputImageTargetSize(set, 256, false);
-            yield return new OutputImageTargetSize(set, 48, false);
-            yield return new OutputImageTargetSize(set, 24, false);
-            yield return new OutputImageTargetSize(set, 16, false);
-            yield return new OutputImageTargetSize(set, 256, true);
-            yield return new OutputImageTargetSize(set, 48, true);
-            yield return new OutputImageTargetSize(set, 24, true);
-            yield return new OutputImageTargetSize(set, 16, true);
+            if (manifestImage && set.Width == 44 && set.Height == 44)
+            {
+                yield return new OutputImageTargetSize(set, 256, false);
+                yield return new OutputImageTargetSize(set, 48, false);
+                yield return new OutputImageTargetSize(set, 24, false);
+                yield return new OutputImageTargetSize(set, 16, false);
+                yield return new OutputImageTargetSize(set, 256, true);
+                yield return new OutputImageTargetSize(set, 48, true);
+                yield return new OutputImageTargetSize(set, 24, true);
+                yield return new OutputImageTargetSize(set, 16, true);
+            }
         }
     }
 }

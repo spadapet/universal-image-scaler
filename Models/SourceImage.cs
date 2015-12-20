@@ -62,6 +62,11 @@ namespace UniversalImageScaler.Models
             {
                 feature.Initialize();
             }
+
+            if (this.Feature == null && this.features.Count > 0)
+            {
+                this.Feature = this.features[0];
+            }
         }
 
         private void InitSourcePathAndScale()
@@ -131,11 +136,6 @@ namespace UniversalImageScaler.Models
             if (feature != null && !this.features.Contains(feature))
             {
                 this.features.Add(feature);
-
-                if (this.Feature == null)
-                {
-                    this.Feature = feature;
-                }
             }
         }
 

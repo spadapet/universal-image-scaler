@@ -18,16 +18,31 @@ namespace UniversalImageScaler.Models
         private ImageTransformType transformType;
         private ObservableCollection<OutputImage> images;
 
-        public OutputSet(SourceImage owner, string name, double width, double height, bool fixedSize)
+        public OutputSet(SourceImage owner, string name, double width, double height)
         {
             this.owner = owner;
             this.name = name;
             this.description = string.Empty;
             this.width = width;
             this.height = height;
-            this.fixedSize = fixedSize;
+            this.fixedSize = true;
             this.transformType = ImageTransformType.None;
             this.images = new ObservableCollection<OutputImage>();
+
+            owner.PropertyChanged += this.OnOwnerPropertyChanged;
+        }
+
+        public OutputSet(SourceImage owner, string name)
+        {
+            this.owner = owner;
+            this.name = name;
+            this.description = string.Empty;
+            this.transformType = ImageTransformType.None;
+            this.images = new ObservableCollection<OutputImage>();
+
+            this.UpdateSize();
+
+            owner.PropertyChanged += this.OnOwnerPropertyChanged;
         }
 
         public void Initialize()
@@ -219,6 +234,20 @@ namespace UniversalImageScaler.Models
                     image.PropertyChanged += this.OnImagePropertyChanged;
                 }
             }
+        }
+
+        private void OnOwnerPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (!this.FixedSize)
+            {
+                this.UpdateSize();
+            }
+        }
+
+        private void UpdateSize()
+        {
+            this.Width = this.Owner.PixelWidth / this.Owner.Scale;
+            this.Height = this.Owner.PixelHeight / this.Owner.Scale;
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace UniversalImageScaler.Models
+﻿namespace UniversalImageScaler.Models
 {
     internal class OutputImageScaleOptional8 : OutputImageScale
     {
