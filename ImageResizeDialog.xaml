@@ -19,6 +19,8 @@
     d:DataContext="{d:DesignInstance Type=models:SourceImage, IsDesignTimeCreatable=True}">
 
     <vsui:DialogWindow.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisible" />
+
         <DataTemplate DataType="{x:Type models:OutputFeature}">
             <TextBlock Text="{Binding Name}" ToolTip="{Binding Tooltip}" />
         </DataTemplate>
@@ -44,18 +46,33 @@
         </Grid.RowDefinitions>
         <DockPanel>
             <StackPanel Margin="0,0,0,5" DockPanel.Dock="Top" Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Stretch">
-                <TextBlock Text="{Binding FileName}" />
-                <Border
-                    HorizontalAlignment="Left" 
-                    Margin="0,5,0,10"
-                    BorderThickness="1"
-                    BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}">
-                    <Image
-                        Stretch="Uniform"
-                        Width="150"
-                        Height="150"
-                        Source="{Binding Image}" />
-                </Border>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Vertical">
+                        <TextBox Text="{Binding FileName, Mode=OneWay}" BorderThickness="0" Background="Transparent" IsReadOnly="True" />
+                        <Border
+                            HorizontalAlignment="Left"
+                            Margin="0,5,0,10"
+                            BorderThickness="1"
+                            BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}">
+                            <Image
+                                Stretch="Uniform"
+                                Width="150"
+                                Height="150"
+                                Source="{Binding Image}" />
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10,0,0,0">
+                        <TextBlock Text="Source image scale:" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox Margin="0,5,0,0" Width="50" HorizontalAlignment="Left" IsReadOnly="{Binding ScaleReadOnly}" Text="{Binding Scale100, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock VerticalAlignment="Center" Text="%" Margin="2,0,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
                 <TextBlock Text="The destination folder is:" />
                 <TextBox Margin="5,5,0,5" Text="{Binding FullDir, Mode=OneTime}" IsReadOnly="True" Background="Transparent" BorderThickness="0" />
                 <TextBlock Text="What images would you like to create?" />

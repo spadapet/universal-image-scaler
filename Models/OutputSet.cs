@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using UniversalImageScaler.Utility;
 
 namespace UniversalImageScaler.Models
 {
@@ -14,6 +15,7 @@ namespace UniversalImageScaler.Models
         private double height;
         private bool fixedSize;
         private bool? generate;
+        private ImageTransformType transformType;
         private ObservableCollection<OutputImage> images;
 
         public OutputSet(SourceImage owner, string name, double width, double height, bool fixedSize)
@@ -24,6 +26,7 @@ namespace UniversalImageScaler.Models
             this.width = width;
             this.height = height;
             this.fixedSize = fixedSize;
+            this.transformType = ImageTransformType.None;
             this.images = new ObservableCollection<OutputImage>();
         }
 
@@ -96,6 +99,19 @@ namespace UniversalImageScaler.Models
                 {
                     this.fixedSize = value;
                     this.OnPropertyChanged(nameof(this.FixedSize));
+                }
+            }
+        }
+
+        public ImageTransformType TransformType
+        {
+            get { return this.transformType; }
+            set
+            {
+                if (this.transformType != value)
+                {
+                    this.transformType = value;
+                    this.OnPropertyChanged(nameof(this.TransformType));
                 }
             }
         }

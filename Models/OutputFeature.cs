@@ -7,6 +7,7 @@ namespace UniversalImageScaler.Models
     {
         private string name;
         private string description;
+        private bool allowChangeScale;
         private ObservableCollection<OutputSet> sets;
 
         public OutputFeature(string name)
@@ -38,6 +39,19 @@ namespace UniversalImageScaler.Models
                 {
                     this.description = value;
                     this.OnPropertyChanged(nameof(this.Tooltip));
+                }
+            }
+        }
+
+        public bool AllowChangeScale
+        {
+            get { return this.allowChangeScale; }
+            set
+            {
+                if (this.allowChangeScale != value)
+                {
+                    this.allowChangeScale = value;
+                    this.OnPropertyChanged(nameof(this.AllowChangeScale));
                 }
             }
         }

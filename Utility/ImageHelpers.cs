@@ -6,7 +6,7 @@ using System.Windows.Media.Imaging;
 
 namespace UniversalImageScaler.Utility
 {
-    internal enum ImageTransformType
+    public enum ImageTransformType
     {
         None,
         WhiteOnly,

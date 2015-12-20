@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -24,7 +26,7 @@ namespace UniversalImageScaler.Utility
 
         public static void PopulateDesignTimeFeatures(SourceImage image)
         {
-            OutputFeature feature = new OutputFeature("Test feature");
+            OutputFeature feature = new OutputFeature("Test feature") { AllowChangeScale = true };
             image.AddFeature(feature);
 
             OutputSet set = new OutputSet(image, "Test image", 8, 8, true);
@@ -51,11 +53,11 @@ namespace UniversalImageScaler.Utility
             image.AddFeature(feature);
         }
 
-        public static void PopulateFeatures(SourceImage image)
+        public static void PopulateFeatures(SourceImage source)
         {
-            OutputFeature scaleFeature = OutputHelpers.InitScaleFeature(image);
-            OutputFeature squareFeature = OutputHelpers.InitSquareManifestFeature();
-            OutputFeature wideFeature = OutputHelpers.InitWideManifestFeature();
+            OutputFeature scaleFeature = OutputHelpers.InitScaleFeature(source);
+            OutputFeature squareFeature = OutputHelpers.InitSquareManifestFeature(source);
+            OutputFeature wideFeature = OutputHelpers.InitWideManifestFeature(source);
             OutputFeature bothFeature = null;
 
             if (squareFeature != null && wideFeature != null)
@@ -73,70 +75,108 @@ namespace UniversalImageScaler.Utility
                 }
             }
 
-            image.AddFeature(scaleFeature);
-            image.AddFeature(squareFeature);
-            image.AddFeature(wideFeature);
-            image.AddFeature(bothFeature);
+            source.AddFeature(scaleFeature);
+            source.AddFeature(squareFeature);
+            source.AddFeature(wideFeature);
+            source.AddFeature(bothFeature);
         }
 
-        private static OutputFeature InitScaleFeature(SourceImage image)
+        private static OutputFeature InitScaleFeature(SourceImage source)
         {
             OutputFeature feature = new OutputFeature("Smaller Scales of Selected Image");
-            string setName = Path.GetFileName(image.UnscaledPath);
-            OutputSet set = null;
+            string setName = Path.GetFileName(source.UnscaledPath);
+            double width = source.PixelWidth / source.Scale;
+            double height = source.PixelHeight / source.Scale;
+            OutputSet set = new OutputSet(source, setName, width, height, true);
 
-            if (image.Scale.HasValue)
+            foreach (OutputImage image in OutputHelpers.CreateOutputImages(set))
             {
-                double width = image.PixelWidth / image.Scale.Value;
-                double height = image.PixelHeight / image.Scale.Value;
-                set = new OutputSet(image, setName, width, height, true);
-
-                // TODO: Add images
-            }
-            else
-            {
-                double width = image.PixelWidth / 4.0;
-                double height = image.PixelHeight / 4.0;
-                set = new OutputSet(image, setName, width, height, false);
-
-                // TODO: Add images
+                set.AddImage(image);
             }
 
             feature.AddSet(set);
             return feature;
         }
 
-        private static OutputFeature InitSquareManifestFeature()
+        private static OutputFeature InitSquareManifestFeature(SourceImage source)
         {
             OutputFeature feature = new OutputFeature("Square Manifest Images");
+            OutputSet[] sets = new OutputSet[]
+            {
+                new OutputSet(source, "Square 71x71 Logo", 71, 71, true),
+                new OutputSet(source, "Square 150x150 Logo", 150, 150, true),
+                new OutputSet(source, "Square 310x310 Logo", 310, 310, true),
+                new OutputSet(source, "Square 44x44 Logo", 44, 44, true),
+                new OutputSet(source, "Store Logo", 50, 50, true),
+                new OutputSet(source, "Badge Logo", 24, 24, true) { TransformType = ImageTransformType.WhiteOnly },
+            };
+
+            foreach (OutputSet set in sets)
+            {
+                foreach (OutputImage image in OutputHelpers.CreateOutputImages(set))
+                {
+                    set.AddImage(image);
+                }
+
+                foreach (OutputImage image in OutputHelpers.CreateOutputTargetSizeImages(set))
+                {
+                    set.AddImage(image);
+                }
+
+                feature.AddSet(set);
+            }
 
             return feature;
-
-            //if (this.sourceScale.HasValue)
-            //{
-            //    this.images.Add(new OutputImage(this, "Square 71x71 Logo", 71, 71));
-            //    this.images.Add(new OutputImage(this, "Square 150x150 Logo", 150, 150));
-            //    this.images.Add(new OutputImage(this, "Wide 310x150 Logo", 310, 150));
-            //    this.images.Add(new OutputImage(this, "Square 310x310 Logo", 310, 310));
-            //    this.images.Add(new OutputImage(this, "Square 44x44 Logo", 44, 44, 256, 48, 24, 16));
-            //    this.images.Add(new OutputImage(this, "Store Logo", 50, 50));
-            //    this.images.Add(new OutputImage(this, "Badge Logo", 24, 24) { TransformType = ImageTransformType.WhiteOnly });
-            //    this.images.Add(new OutputImage(this, "Splash Screen", 620, 300));
-            //}
-            //else
-            //{
-            //    this.images.Add(new OutputImage(this, this.FileName,
-            //        (int)(this.sourceImage.PixelWidth / this.sourceScale.Value),
-            //        (int)(this.sourceImage.PixelHeight / this.sourceScale.Value)));
-            //}
-
         }
 
-        private static OutputFeature InitWideManifestFeature()
+        private static OutputFeature InitWideManifestFeature(SourceImage source)
         {
             OutputFeature feature = new OutputFeature("Wide Manifest Images");
+            OutputSet[] sets = new OutputSet[]
+            {
+                new OutputSet(source, "Wide 310x150 Logo", 310, 150, true),
+                new OutputSet(source, "Splash Screen", 620, 300, true),
+            };
+
+            foreach (OutputSet set in sets)
+            {
+                foreach (OutputImage image in OutputHelpers.CreateOutputImages(set))
+                {
+                    set.AddImage(image);
+                }
+
+                foreach (OutputImage image in OutputHelpers.CreateOutputTargetSizeImages(set))
+                {
+                    set.AddImage(image);
+                }
+
+                feature.AddSet(set);
+            }
 
             return feature;
+        }
+
+        private static IEnumerable<OutputImage> CreateOutputImages(OutputSet set)
+        {
+            yield return new OutputImageScale(set, 4);
+            yield return new OutputImageScale(set, 2);
+            yield return new OutputImageScaleOptional8(set, 1.8);
+            yield return new OutputImageScaleOptional10(set, 1.5);
+            yield return new OutputImageScaleOptional8(set, 1.4);
+            yield return new OutputImageScaleOptional10(set, 1.25);
+            yield return new OutputImageScale(set, 1);
+        }
+
+        private static IEnumerable<OutputImage> CreateOutputTargetSizeImages(OutputSet set)
+        {
+            yield return new OutputImageTargetSize(set, 256, false);
+            yield return new OutputImageTargetSize(set, 48, false);
+            yield return new OutputImageTargetSize(set, 24, false);
+            yield return new OutputImageTargetSize(set, 16, false);
+            yield return new OutputImageTargetSize(set, 256, true);
+            yield return new OutputImageTargetSize(set, 48, true);
+            yield return new OutputImageTargetSize(set, 24, true);
+            yield return new OutputImageTargetSize(set, 16, true);
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using Microsoft.VisualStudio.Shell.Interop;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
+using Microsoft.VisualStudio.Shell.Interop;
 using UniversalImageScaler.Utility;
 
 namespace UniversalImageScaler.Models
@@ -18,9 +18,10 @@ namespace UniversalImageScaler.Models
         private int pathScaleLength;
         private BitmapSource image;
         private ImageFileType imageType;
-        private double? scale;
         private ObservableCollection<OutputFeature> features;
         private OutputFeature feature;
+        private double scale;
+        private bool scaleReadOnly;
         private bool showOptionalScales8;
         private bool showOptionalScales10;
 
@@ -36,7 +37,7 @@ namespace UniversalImageScaler.Models
             this.pathScaleLength = 11;
             this.image = OutputHelpers.CreateDesignTimeSourceImage();
             this.imageType = ImageFileType.Png;
-            this.scale = 400;
+            this.scale = 4;
             this.features = new ObservableCollection<OutputFeature>();
 
             OutputHelpers.PopulateDesignTimeFeatures(this);
@@ -66,35 +67,38 @@ namespace UniversalImageScaler.Models
         private void InitSourcePathAndScale()
         {
             object nameObj;
-            if (this.item.pHier.GetCanonicalName(this.item.itemid, out this.path) >= 0 &&
-                this.item.pHier.GetProperty(this.item.itemid, (int)__VSHPROPID.VSHPROPID_Name, out nameObj) >= 0 &&
-                nameObj is string)
+            if (this.item.pHier.GetCanonicalName(this.item.itemid, out this.path) < 0 ||
+                this.item.pHier.GetProperty(this.item.itemid, (int)__VSHPROPID.VSHPROPID_Name, out nameObj) < 0 ||
+                !(nameObj is string))
             {
-                // Replace the lower-case name with the original case
-                this.path = Path.Combine(Path.GetDirectoryName(this.path), (string)nameObj);
+                throw new ArgumentException("item must be an image");
+            }
 
-                Match match = Regex.Match(this.path, @"\.scale-(?<scale>\d{3})\.");
-                if (match != null && match.Success && match.Index >= this.path.Length - Path.GetFileName(this.path).Length)
-                {
-                    this.pathScaleStart = match.Index;
-                    this.pathScaleLength = match.Length;
+            // Replace the lower-case name with the original case
+            this.path = Path.Combine(Path.GetDirectoryName(this.path), (string)nameObj);
 
-                    int scale;
-                    if (int.TryParse(match.Groups["scale"].Value, out scale) && scale > 0)
-                    {
-                        this.scale = scale / 100.0;
-                    }
-                }
-                else
+            Match match = Regex.Match(this.path, @"\.scale-(?<scale>\d{3})\.");
+            if (match != null && match.Success && match.Index >= this.path.Length - Path.GetFileName(this.path).Length)
+            {
+                this.pathScaleStart = match.Index;
+                this.pathScaleLength = match.Length;
+
+                int scale;
+                if (int.TryParse(match.Groups["scale"].Value, out scale) && scale > 0)
                 {
-                    string extension = Path.GetExtension(this.path);
-                    this.pathScaleStart = this.path.Length - extension.Length;
-                    this.pathScaleLength = 0;
+                    this.scale = scale / 100.0;
+                    this.scaleReadOnly = true;
                 }
             }
             else
             {
-                throw new ArgumentException("item must be an image");
+                string extension = Path.GetExtension(this.path);
+                this.pathScaleStart = this.path.Length - extension.Length;
+                this.pathScaleLength = 0;
+
+                // Just guess for now, the user can change it
+                this.scale = 2;
+                this.scaleReadOnly = false;
             }
         }
 
@@ -145,9 +149,37 @@ namespace UniversalImageScaler.Models
             get { return this.image; }
         }
 
-        public double? Scale
+        public double Scale
         {
             get { return this.scale; }
+            set
+            {
+                if (!this.scaleReadOnly && this.scale != value)
+                {
+                    this.scale = value;
+                    this.OnPropertyChanged(nameof(this.Scale));
+                    this.OnPropertyChanged(nameof(this.Scale100));
+                }
+            }
+        }
+
+        public double Scale100
+        {
+            get { return this.scale * 100.0; }
+            set
+            {
+                if (!this.scaleReadOnly && this.Scale100 != value)
+                {
+                    this.scale = value / 100.0;
+                    this.OnPropertyChanged(nameof(this.Scale));
+                    this.OnPropertyChanged(nameof(this.Scale100));
+                }
+            }
+        }
+
+        public bool ScaleReadOnly
+        {
+            get { return this.scaleReadOnly; }
         }
 
         public double PixelWidth
