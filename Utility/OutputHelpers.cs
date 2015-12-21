@@ -87,7 +87,7 @@ namespace UniversalImageScaler.Utility
         {
             OutputFeature feature = new OutputFeature("Smaller scales of the source image")
             {
-                Tooltip = "",
+                Tooltip = "The scale of the source image is determined by '.scale-XXX.' in the filename. Otherwise you can set it above.",
             };
 
             string setName = Path.GetFileName(source.UnscaledPath);
@@ -113,37 +113,37 @@ namespace UniversalImageScaler.Utility
             {
                 new OutputSet(source, "Square 71x71 logo (small app tile)", 71, 71)
                 {
-                    Tooltip = "",
+                    Tooltip = "This is used for your small app tile on the start screen",
                     OutputFileType = ImageFileType.Png,
                 },
 
                 new OutputSet(source, "Square 150x150 logo (medium app tile)", 150, 150)
                 {
-                    Tooltip = "",
+                    Tooltip = "This is used for your medium app tile on the start screen",
                     OutputFileType = ImageFileType.Png,
                 },
 
                 new OutputSet(source, "Square 310x310 logo (large app tile)", 310, 310)
                 {
-                    Tooltip = "",
+                    Tooltip = "This is used for your large app tile on the start screen",
                     OutputFileType = ImageFileType.Png,
                 },
 
                 new OutputSet(source, "Square 44x44 logo (app list icon)", 44, 44)
                 {
-                    Tooltip = "",
+                    Tooltip = "This is used for your app on the task bar",
                     OutputFileType = ImageFileType.Png,
                 },
 
                 new OutputSet(source, "Store logo", 50, 50)
                 {
-                    Tooltip = "",
+                    Tooltip = "This will be your app's icon in the store",
                     OutputFileType = ImageFileType.Png,
                 },
 
                 new OutputSet(source, "Badge logo (white only)", 24, 24)
                 {
-                    Tooltip = "",
+                    Tooltip = "This will show on the lock screen when your app has notifications",
                     TransformType = ImageTransformType.WhiteOnly,
                     OutputFileType = ImageFileType.Png,
                 },
@@ -173,13 +173,13 @@ namespace UniversalImageScaler.Utility
             {
                 new OutputSet(source, "Wide 310x150 Logo", 310, 150)
                 {
-                    Tooltip = "",
+                    Tooltip = "This is used for your wide app tile on the start screen",
                     OutputFileType = ImageFileType.Png,
                 },
 
                 new OutputSet(source, "Splash Screen", 620, 300)
                 {
-                    Tooltip = "",
+                    Tooltip = "While your app is loading, Windows will show this image on the splash screen",
                     OutputFileType = ImageFileType.Png,
                 },
             };

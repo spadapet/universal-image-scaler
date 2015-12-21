@@ -199,7 +199,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\ImageResize.png" />
-    <Content Include="Resources\ImageResizePackage.ico" />
+    <Content Include="Resources\ImageResizePackage.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Resource Include="Resources\info.png" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="ImageResizeDialog.xaml">

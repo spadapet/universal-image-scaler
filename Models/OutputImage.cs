@@ -28,7 +28,7 @@ namespace UniversalImageScaler.Models
 
         public virtual string Tooltip
         {
-            get { return null; }
+            get { return this.Owner.Tooltip; }
         }
 
         public bool Generate
@@ -90,6 +90,7 @@ namespace UniversalImageScaler.Models
         private void OnImagePropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             this.UpdateEnabled();
+            this.OnPropertyChanged(nameof(this.Tooltip));
         }
     }
 }

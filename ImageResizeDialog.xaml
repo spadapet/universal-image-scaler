@@ -36,7 +36,11 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type models:OutputImage}">
-            <CheckBox IsChecked="{Binding Generate}" Content="{Binding DisplayText}" ToolTip="{Binding Tooltip}" Visibility="{Binding Enabled, Converter={StaticResource BoolToVisible}}" />
+            <CheckBox
+                IsChecked="{Binding Generate}"
+                Content="{Binding DisplayText}"
+                ToolTip="{Binding Tooltip}"
+                Visibility="{Binding Enabled, Converter={StaticResource BoolToVisible}}" />
         </DataTemplate>
     </vsui:DialogWindow.Resources>
 
@@ -98,8 +102,30 @@
                 </Grid>
                 <TextBlock Text="The destination folder is:" />
                 <TextBox Margin="5,5,0,5" IsTabStop="False" Text="{Binding FullDir, Mode=OneTime}" IsReadOnly="True" Background="Transparent" BorderThickness="0" />
+
+                <Rectangle Fill="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" Height="1" Margin="0,5" />
                 <TextBlock Text="What images would you like to create?" />
-                <ComboBox Margin="0,5,0,0" ItemsSource="{Binding Features}" SelectedItem="{Binding Feature}" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ComboBox
+                        Margin="0,5,0,0" 
+                        ItemsSource="{Binding Features}"
+                        SelectedItem="{Binding Feature}"
+                        VerticalAlignment="Center"
+                        ToolTip="{Binding Feature.Tooltip}" />
+                    <Image
+                        Grid.Column="1"
+                        Source="Resources/info.png"
+                        Opacity="0.75"
+                        Margin="5,0,0,0"
+                        Width="20"
+                        Height="20" 
+                        VerticalAlignment="Center"
+                        ToolTip="{Binding Feature.Tooltip}" />
+                </Grid>
             </StackPanel>
             <Border
                 BorderThickness="1"

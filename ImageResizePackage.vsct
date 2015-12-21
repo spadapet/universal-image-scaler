@@ -11,7 +11,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText>Scale image for Universal App...</ButtonText>
+          <ButtonText>Scale image for Windows app...</ButtonText>
         </Strings>
       </Button>
     </Buttons>
