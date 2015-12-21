@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using UniversalImageScaler.Utility;
 
 namespace UniversalImageScaler.Models
 {
@@ -56,6 +57,11 @@ namespace UniversalImageScaler.Models
             }
         }
 
+        public ImageFileType OutputFileType
+        {
+            get { return this.Owner.OutputFileType; }
+        }
+
         protected OutputSet Owner
         {
             get { return this.owner; }
@@ -74,6 +80,11 @@ namespace UniversalImageScaler.Models
         protected virtual bool ShouldEnable
         {
             get { return true; }
+        }
+
+        protected virtual bool IsOptional
+        {
+            get { return false; }
         }
 
         private void OnImagePropertyChanged(object sender, PropertyChangedEventArgs args)

@@ -41,10 +41,16 @@
         {
             get
             {
-                string text = $"Target size {this.PixelWidth}x{this.PixelHeight}px";
+                string text = $"Target size {this.PixelWidth}px x {this.PixelHeight}px";
+
                 if (this.unplated)
                 {
                     text += ", unplated";
+                }
+
+                if (this.IsOptional)
+                {
+                    text += " (optional)";
                 }
 
                 return text;
@@ -55,6 +61,7 @@
         {
             get
             {
+
                 return base.ShouldEnable && (this.Image.PixelWidth >= this.targetSize || this.Image.PixelHeight >= targetSize);
             }
         }

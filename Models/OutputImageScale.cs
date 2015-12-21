@@ -58,11 +58,6 @@ namespace UniversalImageScaler.Models
             }
         }
 
-        protected virtual bool IsOptional
-        {
-            get { return false; }
-        }
-
         private void OnOwnerPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             this.OnPropertyChanged(nameof(this.Path));

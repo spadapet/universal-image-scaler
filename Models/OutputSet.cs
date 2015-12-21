@@ -16,6 +16,7 @@ namespace UniversalImageScaler.Models
         private bool fixedSize;
         private bool? generate;
         private ImageTransformType transformType;
+        private ImageFileType outputType;
         private ObservableCollection<OutputImage> images;
 
         public OutputSet(SourceImage owner, string name, double width, double height)
@@ -27,6 +28,7 @@ namespace UniversalImageScaler.Models
             this.height = height;
             this.fixedSize = true;
             this.transformType = ImageTransformType.None;
+            this.outputType = owner.ImageType;
             this.images = new ObservableCollection<OutputImage>();
 
             owner.PropertyChanged += this.OnOwnerPropertyChanged;
@@ -38,6 +40,7 @@ namespace UniversalImageScaler.Models
             this.name = name;
             this.description = string.Empty;
             this.transformType = ImageTransformType.None;
+            this.outputType = owner.ImageType;
             this.images = new ObservableCollection<OutputImage>();
 
             this.UpdateSize();
@@ -52,8 +55,7 @@ namespace UniversalImageScaler.Models
                 image.Initialize();
             }
 
-            this.UpdateGenerate();
-            this.UpdateImageGenerate();
+            this.Generate = true;
         }
 
         public SourceImage Owner
@@ -127,6 +129,19 @@ namespace UniversalImageScaler.Models
                 {
                     this.transformType = value;
                     this.OnPropertyChanged(nameof(this.TransformType));
+                }
+            }
+        }
+
+        public ImageFileType OutputFileType
+        {
+            get { return this.outputType; }
+            set
+            {
+                if (this.outputType != value)
+                {
+                    this.outputType = value;
+                    this.OnPropertyChanged(nameof(this.OutputFileType));
                 }
             }
         }

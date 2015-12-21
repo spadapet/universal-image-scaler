@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
@@ -62,7 +61,10 @@ namespace UniversalImageScaler.Utility
 
             if (squareFeature != null && wideFeature != null)
             {
-                bothFeature = new OutputFeature("Square and Wide Manifest Images");
+                bothFeature = new OutputFeature("Square and wide manifest images (for app store)")
+                {
+                    Tooltip = "Recommended source image size: 1240px x 1240px",
+                };
 
                 foreach (OutputSet set in squareFeature.Sets)
                 {
@@ -83,7 +85,11 @@ namespace UniversalImageScaler.Utility
 
         private static OutputFeature InitScaleFeature(SourceImage source)
         {
-            OutputFeature feature = new OutputFeature("Smaller Scales of Selected Image");
+            OutputFeature feature = new OutputFeature("Smaller scales of the source image")
+            {
+                Tooltip = "",
+            };
+
             string setName = Path.GetFileName(source.UnscaledPath);
             OutputSet set = new OutputSet(source, setName);
 
@@ -98,15 +104,49 @@ namespace UniversalImageScaler.Utility
 
         private static OutputFeature InitSquareManifestFeature(SourceImage source)
         {
-            OutputFeature feature = new OutputFeature("Square Manifest Images");
+            OutputFeature feature = new OutputFeature("Square manifest images (for app store)")
+            {
+                Tooltip = "Recommended source image size: 1240px x 1240px",
+            };
+
             OutputSet[] sets = new OutputSet[]
             {
-                new OutputSet(source, "Square 71x71 Logo", 71, 71),
-                new OutputSet(source, "Square 150x150 Logo", 150, 150),
-                new OutputSet(source, "Square 310x310 Logo", 310, 310),
-                new OutputSet(source, "Square 44x44 Logo", 44, 44),
-                new OutputSet(source, "Store Logo", 50, 50),
-                new OutputSet(source, "Badge Logo", 24, 24) { TransformType = ImageTransformType.WhiteOnly },
+                new OutputSet(source, "Square 71x71 logo (small app tile)", 71, 71)
+                {
+                    Tooltip = "",
+                    OutputFileType = ImageFileType.Png,
+                },
+
+                new OutputSet(source, "Square 150x150 logo (medium app tile)", 150, 150)
+                {
+                    Tooltip = "",
+                    OutputFileType = ImageFileType.Png,
+                },
+
+                new OutputSet(source, "Square 310x310 logo (large app tile)", 310, 310)
+                {
+                    Tooltip = "",
+                    OutputFileType = ImageFileType.Png,
+                },
+
+                new OutputSet(source, "Square 44x44 logo (app list icon)", 44, 44)
+                {
+                    Tooltip = "",
+                    OutputFileType = ImageFileType.Png,
+                },
+
+                new OutputSet(source, "Store logo", 50, 50)
+                {
+                    Tooltip = "",
+                    OutputFileType = ImageFileType.Png,
+                },
+
+                new OutputSet(source, "Badge logo (white only)", 24, 24)
+                {
+                    Tooltip = "",
+                    TransformType = ImageTransformType.WhiteOnly,
+                    OutputFileType = ImageFileType.Png,
+                },
             };
 
             foreach (OutputSet set in sets)
@@ -124,11 +164,24 @@ namespace UniversalImageScaler.Utility
 
         private static OutputFeature InitWideManifestFeature(SourceImage source)
         {
-            OutputFeature feature = new OutputFeature("Wide Manifest Images");
+            OutputFeature feature = new OutputFeature("Wide manifest images (for app store)")
+            {
+                Tooltip = "Recommended source image size: 2480px x 1200px",
+            };
+
             OutputSet[] sets = new OutputSet[]
             {
-                new OutputSet(source, "Wide 310x150 Logo", 310, 150),
-                new OutputSet(source, "Splash Screen", 620, 300),
+                new OutputSet(source, "Wide 310x150 Logo", 310, 150)
+                {
+                    Tooltip = "",
+                    OutputFileType = ImageFileType.Png,
+                },
+
+                new OutputSet(source, "Splash Screen", 620, 300)
+                {
+                    Tooltip = "",
+                    OutputFileType = ImageFileType.Png,
+                },
             };
 
             foreach (OutputSet set in sets)
@@ -156,14 +209,23 @@ namespace UniversalImageScaler.Utility
 
             if (manifestImage && set.Width == 44 && set.Height == 44)
             {
-                yield return new OutputImageTargetSize(set, 256, false);
-                yield return new OutputImageTargetSize(set, 48, false);
-                yield return new OutputImageTargetSize(set, 24, false);
-                yield return new OutputImageTargetSize(set, 16, false);
-                yield return new OutputImageTargetSize(set, 256, true);
-                yield return new OutputImageTargetSize(set, 48, true);
-                yield return new OutputImageTargetSize(set, 24, true);
-                yield return new OutputImageTargetSize(set, 16, true);
+                foreach (bool unplated in new bool[] { false, true })
+                {
+                    yield return new OutputImageTargetSize(set, 256, unplated);
+                    yield return new OutputImageTargetSizeOptional10(set, 96, unplated);
+                    yield return new OutputImageTargetSizeOptional10(set, 80, unplated);
+                    yield return new OutputImageTargetSizeOptional10(set, 72, unplated);
+                    yield return new OutputImageTargetSizeOptional10(set, 64, unplated);
+                    yield return new OutputImageTargetSizeOptional10(set, 60, unplated);
+                    yield return new OutputImageTargetSize(set, 48, unplated);
+                    yield return new OutputImageTargetSizeOptional10(set, 40, unplated);
+                    yield return new OutputImageTargetSizeOptional10(set, 36, unplated);
+                    yield return new OutputImageTargetSize(set, 32, unplated);
+                    yield return new OutputImageTargetSizeOptional10(set, 30, unplated);
+                    yield return new OutputImageTargetSize(set, 24, unplated);
+                    yield return new OutputImageTargetSizeOptional10(set, 20, unplated);
+                    yield return new OutputImageTargetSize(set, 16, unplated);
+                }
             }
         }
     }
