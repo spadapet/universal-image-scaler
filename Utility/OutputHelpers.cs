@@ -88,6 +88,7 @@ namespace UniversalImageScaler.Utility
             OutputFeature feature = new OutputFeature("Smaller scales of the source image")
             {
                 Tooltip = "The scale of the source image is determined by '.scale-XXX.' in the filename. Otherwise you can set it above.",
+                AllowChangeScale = true,
             };
 
             string setName = Path.GetFileName(source.UnscaledPath);
