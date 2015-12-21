@@ -7,7 +7,8 @@
     <MoreInfo>https://github.com/spadapet/universal-image-scaler</MoreInfo>
     <GettingStartedGuide>https://visualstudiogallery.msdn.microsoft.com/824f5375-b0c7-4d79-b9bf-04653876ba53</GettingStartedGuide>
     <ReleaseNotes>https://visualstudiogallery.msdn.microsoft.com/824f5375-b0c7-4d79-b9bf-04653876ba53</ReleaseNotes>
-    <Icon>ImageResizePackage.ico</Icon>
+    <Icon>Resources\ImageResizePackage.ico</Icon>
+    <PreviewImage>Resources\preview.png</PreviewImage>
     <Tags>image, resize, resizing, image resize, image resizing</Tags>
   </Metadata>
   <Installation>
