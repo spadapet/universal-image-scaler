@@ -65,7 +65,9 @@ namespace UniversalImageScaler.Models
 
             if (this.Feature == null && this.features.Count > 0)
             {
-                this.Feature = this.features[0];
+                this.Feature = this.scaleReadOnly
+                    ? this.features[0]
+                    : this.features[this.features.Count - 1];
             }
         }
 
@@ -202,31 +204,57 @@ namespace UniversalImageScaler.Models
             get { return this.GetScaledPath(0); }
         }
 
-        public string GetScaledPath(double scale)
+        public string GetScaledPath(double scale, string fileNameOverride = null)
         {
-            string path = this.pathScaleLength > 0
-                ? this.path.Remove(this.pathScaleStart, this.pathScaleLength - 1)
-                : this.path;
+            string path;
+            int insertPos = -1;
 
-            if (scale > 0)
+            if (string.IsNullOrEmpty(fileNameOverride))
             {
-                path = path.Insert(this.pathScaleStart, $".scale-{(int)(scale * 100.0)}");
+                path = this.pathScaleLength > 0
+                    ? this.path.Remove(this.pathScaleStart, this.pathScaleLength - 1)
+                    : this.path;
+
+                insertPos = this.pathScaleStart;
+            }
+            else
+            {
+                path = Path.Combine(this.FullDir, fileNameOverride);
+                insertPos = path.Length - Path.GetExtension(path).Length;
+            }
+
+            if (insertPos != -1 && scale > 0)
+            {
+                path = path.Insert(insertPos, $".scale-{(int)(scale * 100.0)}");
             }
 
             return path;
         }
 
-        public string GetTargetSizePath(double targetSize, bool unplated)
+        public string GetTargetSizePath(double targetSize, bool unplated, string fileNameOverride = null)
         {
-            string path = this.pathScaleLength > 0
-                ? this.path.Remove(this.pathScaleStart, this.pathScaleLength - 1)
-                : this.path;
+            string path;
+            int insertPos = -1;
 
-            if (targetSize > 0)
+            if (string.IsNullOrEmpty(fileNameOverride))
+            {
+                path = this.pathScaleLength > 0
+                    ? this.path.Remove(this.pathScaleStart, this.pathScaleLength - 1)
+                    : this.path;
+
+                insertPos = this.pathScaleStart;
+            }
+            else
+            {
+                path = Path.Combine(this.FullDir, fileNameOverride);
+                insertPos = path.Length - Path.GetExtension(path).Length;
+            }
+
+            if (insertPos != -1 && targetSize > 0)
             {
                 path = unplated
-                    ? path.Insert(this.pathScaleStart, $".targetsize-{(int)targetSize}_altform-unplated")
-                    : path.Insert(this.pathScaleStart, $".targetsize-{(int)targetSize}");
+                    ? path.Insert(insertPos, $".targetsize-{(int)targetSize}_altform-unplated")
+                    : path.Insert(insertPos, $".targetsize-{(int)targetSize}");
             }
 
             return path;

@@ -30,7 +30,7 @@ namespace UniversalImageScaler.Models
 
         public override string Path
         {
-            get { return this.Owner.Owner.GetScaledPath(this.scale); }
+            get { return this.Owner.GetScaledPath(this.scale); }
         }
 
         public override string DisplayText

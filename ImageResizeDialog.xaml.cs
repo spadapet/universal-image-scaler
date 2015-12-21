@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using Microsoft.VisualStudio.PlatformUI;
 using UniversalImageScaler.Models;
@@ -22,6 +23,18 @@ namespace UniversalImageScaler
             this.DataContext = item;
 
             InitializeComponent();
+        }
+
+        protected override void InvokeDialogHelp()
+        {
+            try
+            {
+                Process.Start("https://visualstudiogallery.msdn.microsoft.com/824f5375-b0c7-4d79-b9bf-04653876ba53");
+            }
+            catch (Exception ex)
+            {
+                Debug.Fail(ex.Message);
+            }
         }
 
         private void OnOk(object sender, RoutedEventArgs args)

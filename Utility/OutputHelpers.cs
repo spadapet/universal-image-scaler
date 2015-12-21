@@ -115,36 +115,42 @@ namespace UniversalImageScaler.Utility
                 new OutputSet(source, "Square 71x71 logo (small app tile)", 71, 71)
                 {
                     Tooltip = "This is used for your small app tile on the start screen",
+                    FileNameOverride = "Square71x71Logo.png",
                     OutputFileType = ImageFileType.Png,
                 },
 
                 new OutputSet(source, "Square 150x150 logo (medium app tile)", 150, 150)
                 {
                     Tooltip = "This is used for your medium app tile on the start screen",
+                    FileNameOverride = "Square 50x150Logo.png",
                     OutputFileType = ImageFileType.Png,
                 },
 
                 new OutputSet(source, "Square 310x310 logo (large app tile)", 310, 310)
                 {
                     Tooltip = "This is used for your large app tile on the start screen",
+                    FileNameOverride = "Square310x310Logo.png",
                     OutputFileType = ImageFileType.Png,
                 },
 
                 new OutputSet(source, "Square 44x44 logo (app list icon)", 44, 44)
                 {
                     Tooltip = "This is used for your app on the task bar",
+                    FileNameOverride = "Square44x44Logo.png",
                     OutputFileType = ImageFileType.Png,
                 },
 
                 new OutputSet(source, "Store logo", 50, 50)
                 {
                     Tooltip = "This will be your app's icon in the store",
+                    FileNameOverride = "StoreLogo.png",
                     OutputFileType = ImageFileType.Png,
                 },
 
                 new OutputSet(source, "Badge logo (white only)", 24, 24)
                 {
                     Tooltip = "This will show on the lock screen when your app has notifications",
+                    FileNameOverride = "BadgeLogo.png",
                     TransformType = ImageTransformType.WhiteOnly,
                     OutputFileType = ImageFileType.Png,
                 },
@@ -172,15 +178,17 @@ namespace UniversalImageScaler.Utility
 
             OutputSet[] sets = new OutputSet[]
             {
-                new OutputSet(source, "Wide 310x150 Logo", 310, 150)
+                new OutputSet(source, "Wide 310x150 logo", 310, 150)
                 {
                     Tooltip = "This is used for your wide app tile on the start screen",
+                    FileNameOverride = "Wide310x150Logo.png",
                     OutputFileType = ImageFileType.Png,
                 },
 
                 new OutputSet(source, "Splash Screen", 620, 300)
                 {
                     Tooltip = "While your app is loading, Windows will show this image on the splash screen",
+                    FileNameOverride = "SplashScreen.png",
                     OutputFileType = ImageFileType.Png,
                 },
             };

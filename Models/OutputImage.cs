@@ -28,7 +28,18 @@ namespace UniversalImageScaler.Models
 
         public virtual string Tooltip
         {
-            get { return this.Owner.Tooltip; }
+            get
+            {
+                string text = System.IO.Path.GetFileName(this.Path);
+                string ownerTip = this.Owner.Tooltip;
+
+                if (!string.IsNullOrEmpty(ownerTip))
+                {
+                    text += "\r\n" + ownerTip;
+                }
+
+                return text;
+            }
         }
 
         public bool Generate

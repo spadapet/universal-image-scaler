@@ -11,6 +11,7 @@ namespace UniversalImageScaler.Models
         private SourceImage owner;
         private string name;
         private string description;
+        private string fileNameOverride;
         private double width;
         private double height;
         private bool fixedSize;
@@ -66,6 +67,19 @@ namespace UniversalImageScaler.Models
         public string Name
         {
             get { return this.name; }
+        }
+
+        public string FileNameOverride
+        {
+            get { return this.fileNameOverride ?? string.Empty; }
+            set
+            {
+                if (this.fileNameOverride != value)
+                {
+                    this.fileNameOverride = value;
+                    this.OnPropertyChanged(nameof(this.FileNameOverride));
+                }
+            }
         }
 
         public string Tooltip
@@ -150,6 +164,16 @@ namespace UniversalImageScaler.Models
         {
             get { return this.generate; }
             set { this.SetGenerate(value, true); }
+        }
+
+        public string GetScaledPath(double scale)
+        {
+            return this.Owner.GetScaledPath(scale, this.FileNameOverride);
+        }
+
+        public string GetTargetSizePath(double targetSize, bool unplated)
+        {
+            return this.Owner.GetTargetSizePath(targetSize, unplated, this.FileNameOverride);
         }
 
         private void SetGenerate(bool? value, bool updateImages)

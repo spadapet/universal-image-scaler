@@ -34,7 +34,7 @@
 
         public override string Path
         {
-            get { return this.Owner.Owner.GetTargetSizePath(this.targetSize, this.unplated); }
+            get { return this.Owner.GetTargetSizePath(this.targetSize, this.unplated); }
         }
 
         public override string DisplayText
