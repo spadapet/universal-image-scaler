@@ -116,7 +116,7 @@ namespace UniversalImageScaler
 
             ImageResizePackage.Instance.MainThreadHelper.Invoke(() =>
             {
-                string file = set.Owner.UnscaledPath;
+                string file = set.UnscaledPath;
                 EnvDTE.Project dteProject = set.Owner.Item.pHier.GetProject();
                 EnvDTE.ProjectItem dteItem = this.serviceProvider.FindProjectItem(file);
                 if (dteItem != null)

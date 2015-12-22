@@ -135,11 +135,14 @@ namespace UniversalImageScaler.Utility
         {
             try
             {
-                FileAttributes attribs = File.GetAttributes(path);
-                if ((attribs & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                if (File.Exists(path))
                 {
-                    attribs &= ~FileAttributes.ReadOnly;
-                    File.SetAttributes(path, attribs);
+                    FileAttributes attribs = File.GetAttributes(path);
+                    if ((attribs & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                    {
+                        attribs &= ~FileAttributes.ReadOnly;
+                        File.SetAttributes(path, attribs);
+                    }
                 }
             }
             catch
