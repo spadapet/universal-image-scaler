@@ -84,7 +84,7 @@ namespace UniversalImageScaler
             await task;
         }
 
-        private void GenerateImagesBackgroundThread(SourceImage source, CancellationToken token, CommonMessagePump pump)
+        private void GenerateImagesBackgroundThread(SourceImage source, CancellationToken token, CommonMessagePump mainThreadPump)
         {
             int totalSets = source.SetsToGenerate.Count();
             int curSet = 0;
@@ -94,7 +94,7 @@ namespace UniversalImageScaler
                 if (!token.IsCancellationRequested)
                 {
                     curSet++;
-                    pump.WaitText = $"Checking existing images ({curSet} of {totalSets}):\r\n{set.UnscaledPath}";
+                    mainThreadPump.WaitText = $"Checking existing images ({curSet} of {totalSets}):\r\n{set.UnscaledPath}";
                     this.OnGeneratingSet(set);
                 }
             }
@@ -107,7 +107,7 @@ namespace UniversalImageScaler
                 if (!token.IsCancellationRequested)
                 {
                     curImage++;
-                    pump.WaitText = $"Adding to the project ({curImage} of {totalImages}):\r\n{image.Path}";
+                    mainThreadPump.WaitText = $"Adding to the project ({curImage} of {totalImages}):\r\n{image.Path}";
                     this.GenerateImage(image);
                     this.OnGeneratedImage(image);
                 }
@@ -129,7 +129,31 @@ namespace UniversalImageScaler
             {
                 IVsHierarchy hierarchy = set.Owner.Item.pHier;
                 uint itemId = hierarchy.FindItemId(set.UnscaledPath);
-                hierarchy.RemoveItemId(itemId);
+                EnvDTE.ProjectItem item = hierarchy.GetProjectItem(itemId);
+                if (item != null)
+                {
+                    foreach (EnvDTE.Property prop in item.Properties) { Debug.WriteLine($"{prop.Name}:{prop.Value}"); }
+
+                    EnvDTE.Property deployProp = item.GetProperty("DeploymentContent");
+                    EnvDTE.Property typeProp = item.GetProperty("ItemType");
+
+                    if (deployProp != null)
+                    {
+                        // C++ project item
+                        if (deployProp.Value is bool && (bool)deployProp.Value)
+                        {
+                            deployProp.Value = false;
+                        }
+                    }
+                    else if (typeProp != null)
+                    {
+                        // C# project item
+                        if (typeProp.Value is string && string.Equals((string)typeProp.Value, "Content", StringComparison.OrdinalIgnoreCase))
+                        {
+                            typeProp.Value = "None";
+                        }
+                    }
+                }
             });
         }
 

@@ -20,6 +20,29 @@ namespace UniversalImageScaler.Utility
             return extObj as EnvDTE.Project;
         }
 
+        public static EnvDTE.ProjectItem GetProjectItem(this IVsHierarchy hierarchy, uint itemId)
+        {
+            object itemObj;
+            if (itemId != 0 && hierarchy.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_ExtObject, out itemObj) == 0)
+            {
+                return itemObj as EnvDTE.ProjectItem;
+            }
+
+            return null;
+        }
+
+        public static EnvDTE.Property GetProperty(this EnvDTE.ProjectItem item, string name)
+        {
+            try
+            {
+                return item.Properties.Item(name);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public static uint FindItemId(this IVsHierarchy hierarchy, string file)
         {
             int found;

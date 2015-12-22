@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using UniversalImageScaler.Utility;
 
 namespace UniversalImageScaler.Models
@@ -15,6 +16,7 @@ namespace UniversalImageScaler.Models
         private string fileNameOverride;
         private double width;
         private double height;
+        private bool enabled;
         private bool expanded;
         private bool fixedSize;
         private bool? generate;
@@ -61,6 +63,14 @@ namespace UniversalImageScaler.Models
             }
 
             this.Generate = true;
+            this.Enabled = true;
+
+            // Must be checked after Generate is set to true
+            if (!this.ImagesToGenerate.Any())
+            {
+                this.Generate = false;
+                this.Enabled = false;
+            }
         }
 
         public SourceImage Owner
@@ -153,6 +163,19 @@ namespace UniversalImageScaler.Models
                 {
                     this.height = value;
                     this.OnPropertyChanged(nameof(this.Height));
+                }
+            }
+        }
+
+        public bool Enabled
+        {
+            get { return this.enabled; }
+            set
+            {
+                if (this.enabled != value)
+                {
+                    this.enabled = value;
+                    this.OnPropertyChanged(nameof(this.Enabled));
                 }
             }
         }
@@ -308,25 +331,15 @@ namespace UniversalImageScaler.Models
                 }
             }
 
+            bool enabled = trueCount > 0 || falseCount > 0;
             bool? generate = null;
 
-            if (trueCount > 0 && falseCount > 0)
+            if (trueCount == 0 || falseCount == 0)
             {
-                // null
-            }
-            else if (trueCount > 0)
-            {
-                generate = true;
-            }
-            else if (falseCount > 0)
-            {
-                generate = false;
-            }
-            else
-            {
-                generate = false;
+                generate = (trueCount > 0);
             }
 
+            this.Enabled = enabled;
             this.SetGenerate(generate, false);
             this.OnPropertyChanged(nameof(this.Tooltip));
             this.OnPropertyChanged(nameof(this.RawTooltip));

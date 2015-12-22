@@ -43,6 +43,7 @@
                         Grid.Column="1"
                         VerticalAlignment="Center"
                         IsChecked="{Binding Generate}"
+                        IsEnabled="{Binding Enabled}"
                         Content="{Binding Name}"
                         ToolTip="{Binding Tooltip}" />
                 </Grid>
@@ -130,7 +131,7 @@
                         </StackPanel>
                     </StackPanel>
                 </Grid>
-                <TextBox Margin="0,5" IsTabStop="False" IsReadOnly="True" Background="Transparent" BorderThickness="0">
+                <TextBox IsTabStop="False" IsReadOnly="True" Background="Transparent" BorderThickness="0">
                     <TextBox.Text>
                         <MultiBinding StringFormat="Output: {0}">
                             <Binding Path="FullDir" Mode="OneTime" />
@@ -156,7 +157,7 @@
                         Opacity="0.75"
                         Margin="5,0,0,0"
                         Width="20"
-                        Height="20" 
+                        Height="20"
                         VerticalAlignment="Center"
                         ToolTip="{Binding Feature.Tooltip}" />
                 </Grid>
