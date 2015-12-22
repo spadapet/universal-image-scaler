@@ -166,6 +166,11 @@ namespace UniversalImageScaler.Models
             set { this.SetGenerate(value, true); }
         }
 
+        public string UnscaledPath
+        {
+            get { return this.GetScaledPath(0); }
+        }
+
         public string GetScaledPath(double scale)
         {
             return this.Owner.GetScaledPath(scale, this.FileNameOverride);

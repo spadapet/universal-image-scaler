@@ -73,7 +73,12 @@ namespace UniversalImageScaler.Models
             get { return this.Owner.OutputFileType; }
         }
 
-        protected OutputSet Owner
+        public ImageTransformType TransformType
+        {
+            get { return this.Owner.TransformType; }
+        }
+
+        public OutputSet Owner
         {
             get { return this.owner; }
         }

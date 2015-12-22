@@ -9,7 +9,7 @@ using UniversalImageScaler.Utility;
 
 namespace UniversalImageScaler.Models
 {
-    public class SourceImage : ModelBase
+    public class SourceImage : ModelBase, IDisposable
     {
         private VSITEMSELECTION item;
 
@@ -71,6 +71,10 @@ namespace UniversalImageScaler.Models
             }
         }
 
+        public void Dispose()
+        {
+        }
+
         private void InitSourcePathAndScale()
         {
             object nameObj;
@@ -115,6 +119,11 @@ namespace UniversalImageScaler.Models
             this.image = ImageHelpers.LoadSourceImage(this.path);
         }
 
+        public VSITEMSELECTION Item
+        {
+            get { return this.item; }
+        }
+
         public IEnumerable<OutputFeature> Features
         {
             get { return this.features; }
@@ -129,6 +138,60 @@ namespace UniversalImageScaler.Models
                 {
                     this.feature = value;
                     this.OnPropertyChanged(nameof(this.Feature));
+                }
+            }
+        }
+
+        public IEnumerable<OutputSet> SetsToGenerate
+        {
+            get
+            {
+                if (this.Feature != null)
+                {
+                    foreach (OutputSet set in this.Feature.Sets)
+                    {
+                        bool hasImage = false;
+
+                        foreach (OutputImage image in set.Images)
+                        {
+                            if (image.Enabled && image.Generate)
+                            {
+                                if (!this.FullPath.Equals(image.Path, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    hasImage = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (hasImage)
+                        {
+                            yield return set;
+                        }
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<OutputImage> ImagesToGenerate
+        {
+            get
+            {
+                if (this.Feature != null)
+                {
+                    foreach (OutputSet set in this.Feature.Sets)
+                    {
+                        foreach (OutputImage image in set.Images)
+                        {
+                            if (image.Enabled && image.Generate)
+                            {
+                                if (!this.FullPath.Equals(image.Path, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    yield return image;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

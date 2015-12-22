@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.Shell;
@@ -33,13 +32,15 @@ namespace UniversalImageScaler
             {
                 try
                 {
-                    SourceImage item = new SourceImage(sel);
-                    ImageResizeDialog dialog = new ImageResizeDialog(item);
-                    bool? result = dialog.ShowModal();
-
-                    if (result.HasValue && result.Value)
+                    using (SourceImage source = new SourceImage(sel))
                     {
-                        await GenerateImagesMainThread(sel, item);
+                        ImageResizeDialog dialog = new ImageResizeDialog(source);
+                        bool? result = dialog.ShowModal();
+
+                        if (result == true)
+                        {
+                            await GenerateImagesMainThread(source);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -65,7 +66,7 @@ namespace UniversalImageScaler
             }
         }
 
-        private async Task GenerateImagesMainThread(VSITEMSELECTION sel, SourceImage item)
+        private async Task GenerateImagesMainThread(SourceImage source)
         {
             CommonMessagePump pump = new CommonMessagePump();
             pump.AllowCancel = true;
@@ -77,10 +78,23 @@ namespace UniversalImageScaler
 
             Task task = Task.Run(() =>
             {
-                foreach (string file in this.GenerateImages(sel, item, token))
+                foreach (OutputSet set in source.SetsToGenerate)
                 {
-                    pump.WaitText = $"Adding to the project:\r\n{file}";
-                    OnGeneratedImage(sel, file);
+                    if (!token.IsCancellationRequested)
+                    {
+                        pump.WaitText = $"Checking existing images:\r\n{set.UnscaledPath}";
+                        this.OnGeneratingSet(set);
+                    }
+                }
+
+                foreach (OutputImage image in source.ImagesToGenerate)
+                {
+                    if (!token.IsCancellationRequested)
+                    {
+                        pump.WaitText = $"Adding to the project:\r\n{image.Path}";
+                        this.GenerateImage(image);
+                        this.OnGeneratedImage(image);
+                    }
                 }
             }, token);
 
@@ -89,65 +103,21 @@ namespace UniversalImageScaler
             await task;
         }
 
-        private IEnumerable<string> GenerateImages(VSITEMSELECTION sel, SourceImage item, CancellationToken token)
+        private void GenerateImage(OutputImage image)
         {
-            yield break;
-#if false
-            foreach (OutputImage image in item.Images)
-            {
-                OnBeforeGenerateImages(sel, item, image);
-
-                if (image.Generate && image.Enabled)
-                {
-                    foreach (double scale in image.Scales)
-                    {
-                        if (!token.IsCancellationRequested)
-                        {
-                            string destPath = Path.Combine(item.FullDir, image.GetScaledFileName(scale));
-                            if (!string.Equals(item.FullPath, destPath, StringComparison.OrdinalIgnoreCase))
-                            {
-                                BitmapSource source = ImageHelpers.ScaleSourceImage(
-                                    item.Image, image.GetScaledWidth(scale), image.GetScaledHeight(scale));
-                                source = ImageHelpers.TransformImage(source, image.TransformType);
-                                ImageHelpers.Save(source, item.ImageType, destPath);
-                                yield return destPath;
-                            }
-                        }
-                    }
-
-                    foreach (double targetSize in image.TargetSizes)
-                    {
-                        if (!token.IsCancellationRequested)
-                        {
-                            string destPath = Path.Combine(item.FullDir, image.GetTargetSizeFileName(targetSize));
-                            if (!string.Equals(item.FullPath, destPath, StringComparison.OrdinalIgnoreCase))
-                            {
-                                BitmapSource source = ImageHelpers.ScaleSourceImage(item.Image, (int)targetSize, (int)targetSize);
-                                ImageHelpers.Save(source, item.ImageType, destPath);
-                                yield return destPath;
-
-                                string unplatedPath = Path.Combine(item.FullDir, image.GetUnplatedTargetSizeFileName(targetSize));
-                                if (!string.Equals(item.FullPath, unplatedPath, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    File.Copy(destPath, unplatedPath, true);
-                                    yield return unplatedPath;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-#endif
+            BitmapSource source = ImageHelpers.ScaleSourceImage(image.Owner.Owner.Image, image.PixelWidth, image.PixelHeight);
+            source = ImageHelpers.TransformImage(source, image.TransformType);
+            ImageHelpers.Save(source, image.OutputFileType, image.Path);
         }
 
-        private void OnBeforeGenerateImages(VSITEMSELECTION sel, SourceImage item, OutputImage image)
+        private void OnGeneratingSet(OutputSet set)
         {
             // Remove existing images
 
             ImageResizePackage.Instance.MainThreadHelper.Invoke(() =>
             {
-                string file = item.UnscaledPath;
-                EnvDTE.Project dteProject = sel.pHier.GetProject();
+                string file = set.Owner.UnscaledPath;
+                EnvDTE.Project dteProject = set.Owner.Item.pHier.GetProject();
                 EnvDTE.ProjectItem dteItem = this.serviceProvider.FindProjectItem(file);
                 if (dteItem != null)
                 {
@@ -162,13 +132,15 @@ namespace UniversalImageScaler
             });
         }
 
-        private void OnGeneratedImage(VSITEMSELECTION sel, string file)
+        private void OnGeneratedImage(OutputImage outputImage)
         {
             // Add the new image to the project
 
             ImageResizePackage.Instance.MainThreadHelper.Invoke(() =>
             {
-                EnvDTE.Project dteProject = sel.pHier.GetProject();
+                EnvDTE.Project dteProject = outputImage.Owner.Owner.Item.pHier.GetProject();
+                string file = outputImage.Path;
+
                 if (this.serviceProvider.FindProjectItem(file) == null)
                 {
                     try

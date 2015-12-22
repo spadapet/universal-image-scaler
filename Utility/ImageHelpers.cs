@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
@@ -132,6 +133,20 @@ namespace UniversalImageScaler.Utility
 
         public static void Save(BitmapSource source, ImageFileType type, string path)
         {
+            try
+            {
+                FileAttributes attribs = File.GetAttributes(path);
+                if ((attribs & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                {
+                    attribs &= ~FileAttributes.ReadOnly;
+                    File.SetAttributes(path, attribs);
+                }
+            }
+            catch
+            {
+                Debug.Fail("Can't update file attributes: " + path);
+            }
+
             switch (type)
             {
                 case ImageFileType.Png:
