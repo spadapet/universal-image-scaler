@@ -132,8 +132,6 @@ namespace UniversalImageScaler
                 EnvDTE.ProjectItem item = hierarchy.GetProjectItem(itemId);
                 if (item != null)
                 {
-                    foreach (EnvDTE.Property prop in item.Properties) { Debug.WriteLine($"{prop.Name}:{prop.Value}"); }
-
                     EnvDTE.Property deployProp = item.GetProperty("DeploymentContent");
                     EnvDTE.Property typeProp = item.GetProperty("ItemType");
 
