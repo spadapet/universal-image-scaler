@@ -130,9 +130,13 @@
                         </StackPanel>
                     </StackPanel>
                 </Grid>
-                <TextBlock Text="The destination folder is:" />
-                <TextBox Margin="5,5,0,5" IsTabStop="False" Text="{Binding FullDir, Mode=OneTime}" IsReadOnly="True" Background="Transparent" BorderThickness="0" />
-
+                <TextBox Margin="0,5" IsTabStop="False" IsReadOnly="True" Background="Transparent" BorderThickness="0">
+                    <TextBox.Text>
+                        <MultiBinding StringFormat="Output: {0}">
+                            <Binding Path="FullDir" Mode="OneTime" />
+                        </MultiBinding>
+                    </TextBox.Text>
+                </TextBox>
                 <Rectangle Fill="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" Height="1" Margin="0,5" />
                 <TextBlock Text="What images would you like to create?" />
                 <Grid>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.Shell;
@@ -76,31 +77,41 @@ namespace UniversalImageScaler
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken token = tokenSource.Token;
 
-            Task task = Task.Run(() =>
-            {
-                foreach (OutputSet set in source.SetsToGenerate)
-                {
-                    if (!token.IsCancellationRequested)
-                    {
-                        pump.WaitText = $"Checking existing images:\r\n{set.UnscaledPath}";
-                        this.OnGeneratingSet(set);
-                    }
-                }
-
-                foreach (OutputImage image in source.ImagesToGenerate)
-                {
-                    if (!token.IsCancellationRequested)
-                    {
-                        pump.WaitText = $"Adding to the project:\r\n{image.Path}";
-                        this.GenerateImage(image);
-                        this.OnGeneratedImage(image);
-                    }
-                }
-            }, token);
+            Task task = Task.Run(() => GenerateImagesBackgroundThread(source, token, pump), token);
 
             CommonMessagePumpExitCode code = pump.ModalWaitForHandles(((IAsyncResult)task).AsyncWaitHandle);
             tokenSource.Cancel();
             await task;
+        }
+
+        private void GenerateImagesBackgroundThread(SourceImage source, CancellationToken token, CommonMessagePump pump)
+        {
+            int totalSets = source.SetsToGenerate.Count();
+            int curSet = 0;
+
+            foreach (OutputSet set in source.SetsToGenerate)
+            {
+                if (!token.IsCancellationRequested)
+                {
+                    curSet++;
+                    pump.WaitText = $"Checking existing images ({curSet} of {totalSets}):\r\n{set.UnscaledPath}";
+                    this.OnGeneratingSet(set);
+                }
+            }
+
+            int totalImages = source.ImagesToGenerate.Count();
+            int curImage = 0;
+
+            foreach (OutputImage image in source.ImagesToGenerate)
+            {
+                if (!token.IsCancellationRequested)
+                {
+                    curImage++;
+                    pump.WaitText = $"Adding to the project ({curImage} of {totalImages}):\r\n{image.Path}";
+                    this.GenerateImage(image);
+                    this.OnGeneratedImage(image);
+                }
+            }
         }
 
         private void GenerateImage(OutputImage image)
@@ -116,19 +127,9 @@ namespace UniversalImageScaler
 
             ImageResizePackage.Instance.MainThreadHelper.Invoke(() =>
             {
-                string file = set.UnscaledPath;
-                EnvDTE.Project dteProject = set.Owner.Item.pHier.GetProject();
-                EnvDTE.ProjectItem dteItem = this.serviceProvider.FindProjectItem(file);
-                if (dteItem != null)
-                {
-                    try
-                    {
-                        dteItem.Remove();
-                    }
-                    catch
-                    {
-                    }
-                }
+                IVsHierarchy hierarchy = set.Owner.Item.pHier;
+                uint itemId = hierarchy.FindItemId(set.UnscaledPath);
+                hierarchy.RemoveItemId(itemId);
             });
         }
 
@@ -138,19 +139,10 @@ namespace UniversalImageScaler
 
             ImageResizePackage.Instance.MainThreadHelper.Invoke(() =>
             {
-                EnvDTE.Project dteProject = outputImage.Owner.Owner.Item.pHier.GetProject();
-                string file = outputImage.Path;
-
-                if (this.serviceProvider.FindProjectItem(file) == null)
-                {
-                    try
-                    {
-                        dteProject.ProjectItems.AddFromFile(file);
-                    }
-                    catch
-                    {
-                    }
-                }
+                IVsHierarchy hierarchy = outputImage.Owner.Owner.Item.pHier;
+                uint itemId = outputImage.Owner.Owner.Item.itemid;
+                uint parentId = hierarchy.FindParentId(itemId);
+                hierarchy.AddItem(parentId, outputImage.Path);
             });
         }
     }

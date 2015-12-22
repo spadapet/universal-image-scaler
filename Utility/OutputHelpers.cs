@@ -126,7 +126,7 @@ namespace UniversalImageScaler.Utility
                 new OutputSet(source, "Square 150x150 logo (medium app tile)", 150, 150)
                 {
                     Tooltip = "This is used for your medium app tile on the start screen",
-                    FileNameOverride = "Square 50x150Logo.png",
+                    FileNameOverride = "Square150x150Logo.png",
                     OutputFileType = ImageFileType.Png,
                 },
 
