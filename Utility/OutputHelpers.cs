@@ -81,6 +81,10 @@ namespace UniversalImageScaler.Utility
             source.AddFeature(squareFeature);
             source.AddFeature(wideFeature);
             source.AddFeature(bothFeature);
+
+            source.Feature = source.ScaleReadOnly
+                ? scaleFeature
+                : bothFeature;
         }
 
         private static OutputFeature InitScaleFeature(SourceImage source)

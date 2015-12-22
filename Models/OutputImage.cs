@@ -31,14 +31,11 @@ namespace UniversalImageScaler.Models
             get
             {
                 string text = System.IO.Path.GetFileName(this.Path);
-                string ownerTip = this.Owner.Tooltip;
+                string ownerTip = this.Owner.RawTooltip;
 
-                if (!string.IsNullOrEmpty(ownerTip))
-                {
-                    text += "\r\n" + ownerTip;
-                }
-
-                return text;
+                return !string.IsNullOrEmpty(ownerTip)
+                    ? $"{ownerTip}\r\n> {text}"
+                    : text;
             }
         }
 

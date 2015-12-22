@@ -30,8 +30,27 @@
 
         <DataTemplate DataType="{x:Type models:OutputSet}">
             <StackPanel Orientation="Vertical">
-                <CheckBox IsChecked="{Binding Generate}" Content="{Binding Name}" ToolTip="{Binding Tooltip}" />
-                <ItemsControl Focusable="False" ItemsSource="{Binding Images}" Margin="20,0,0,0" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Expander
+                        Visibility="{Binding ShowExpander, Converter={StaticResource BoolToVisible}}"
+                        IsExpanded="{Binding Expanded}"
+                        VerticalAlignment="Center" />
+                    <CheckBox
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        IsChecked="{Binding Generate}"
+                        Content="{Binding Name}"
+                        ToolTip="{Binding Tooltip}" />
+                </Grid>
+                <ItemsControl
+                    Focusable="False"
+                    ItemsSource="{Binding Images}"
+                    Margin="20,0,0,0"
+                    Visibility="{Binding Expanded, Converter={StaticResource BoolToVisible}}" />
             </StackPanel>
         </DataTemplate>
 
@@ -47,7 +66,6 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -151,8 +169,7 @@
             </Border>
         </DockPanel>
         <CheckBox Grid.Row="1" Margin="0,5,0,0" Content="Include optional Windows 10 scales" IsChecked="{Binding ShowOptionalScales10}" />
-        <CheckBox Grid.Row="2" Margin="0,5,0,0" Content="Include optional Windows 8 scales" IsChecked="{Binding ShowOptionalScales8}" />
-        <Grid Margin="0,10,0,0" Grid.Row="3" Grid.IsSharedSizeScope="True" HorizontalAlignment="Right">
+        <Grid Margin="0,10,0,0" Grid.Row="2" Grid.IsSharedSizeScope="True" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" SharedSizeGroup="Buttons" />
                 <ColumnDefinition Width="Auto" SharedSizeGroup="Buttons" />

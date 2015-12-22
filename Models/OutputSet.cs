@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using UniversalImageScaler.Utility;
 
 namespace UniversalImageScaler.Models
@@ -14,6 +15,7 @@ namespace UniversalImageScaler.Models
         private string fileNameOverride;
         private double width;
         private double height;
+        private bool expanded;
         private bool fixedSize;
         private bool? generate;
         private ImageTransformType transformType;
@@ -27,6 +29,7 @@ namespace UniversalImageScaler.Models
             this.description = string.Empty;
             this.width = width;
             this.height = height;
+            this.expanded = true;
             this.fixedSize = true;
             this.transformType = ImageTransformType.None;
             this.outputType = owner.ImageType;
@@ -40,6 +43,7 @@ namespace UniversalImageScaler.Models
             this.owner = owner;
             this.name = name;
             this.description = string.Empty;
+            this.expanded = true;
             this.transformType = ImageTransformType.None;
             this.outputType = owner.ImageType;
             this.images = new ObservableCollection<OutputImage>();
@@ -82,15 +86,47 @@ namespace UniversalImageScaler.Models
             }
         }
 
+        public string RawTooltip
+        {
+            get { return this.description ?? string.Empty; }
+        }
+
         public string Tooltip
         {
-            get { return !string.IsNullOrEmpty(this.description) ? this.description : null; }
+            get
+            {
+                string text = this.RawTooltip;
+                int count = 0;
+                const int maxShow = 5;
+
+                foreach (OutputImage image in this.ImagesToGenerate)
+                {
+                    if (++count <= maxShow)
+                    {
+                        if (!string.IsNullOrEmpty(text))
+                        {
+                            text += "\r\n";
+                        }
+
+                        text += $"> {Path.GetFileName(image.Path)}";
+                    }
+                }
+
+                if (count > maxShow)
+                {
+                    text += $"\r\n(plus {count - 6} more)";
+                }
+
+                return !string.IsNullOrEmpty(text) ? text : null;
+            }
+
             set
             {
                 if (this.description != value)
                 {
                     this.description = value;
                     this.OnPropertyChanged(nameof(this.Tooltip));
+                    this.OnPropertyChanged(nameof(this.RawTooltip));
                 }
             }
         }
@@ -117,6 +153,24 @@ namespace UniversalImageScaler.Models
                 {
                     this.height = value;
                     this.OnPropertyChanged(nameof(this.Height));
+                }
+            }
+        }
+
+        public bool ShowExpander
+        {
+            get { return false; }
+        }
+
+        public bool Expanded
+        {
+            get { return this.expanded; }
+            set
+            {
+                if (this.expanded != value)
+                {
+                    this.expanded = value;
+                    this.OnPropertyChanged(nameof(this.Expanded));
                 }
             }
         }
@@ -200,6 +254,20 @@ namespace UniversalImageScaler.Models
             get { return this.images; }
         }
 
+        public IEnumerable<OutputImage> ImagesToGenerate
+        {
+            get
+            {
+                foreach (OutputImage image in this.Images)
+                {
+                    if (image.Generate && image.Enabled)
+                    {
+                        yield return image;
+                    }
+                }
+            }
+        }
+
         public void AddImage(OutputImage image)
         {
             if (image != null && !this.images.Contains(image))
@@ -260,6 +328,8 @@ namespace UniversalImageScaler.Models
             }
 
             this.SetGenerate(generate, false);
+            this.OnPropertyChanged(nameof(this.Tooltip));
+            this.OnPropertyChanged(nameof(this.RawTooltip));
         }
 
         private void UpdateImageGenerate()

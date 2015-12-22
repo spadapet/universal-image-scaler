@@ -65,9 +65,7 @@ namespace UniversalImageScaler.Models
 
             if (this.Feature == null && this.features.Count > 0)
             {
-                this.Feature = this.scaleReadOnly
-                    ? this.features[0]
-                    : this.features[this.features.Count - 1];
+                this.Feature = this.features[0];
             }
         }
 
