@@ -1,7 +1,9 @@
-﻿namespace UniversalImageScaler.Image
+﻿using System.Collections.Generic;
+
+namespace UniversalImageScaler.Image
 {
-    internal interface IImage
+    internal interface IVectorImage : IImage
     {
-        ImageFileType FileType { get; }
+        ICollection<IVectorImagePage> Pages { get; }
     }
 }

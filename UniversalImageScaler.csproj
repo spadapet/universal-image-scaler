@@ -57,6 +57,7 @@
     <Compile Include="Image\IImage.cs" />
     <Compile Include="Image\ImageTransformType.cs" />
     <Compile Include="Image\ImageFileType.cs" />
+    <Compile Include="Image\IVectorImagePage.cs" />
     <Compile Include="Models\OutputFeature.cs" />
     <Compile Include="Models\OutputImage.cs" />
     <Compile Include="Models\OutputImageScaleOptional10.cs" />

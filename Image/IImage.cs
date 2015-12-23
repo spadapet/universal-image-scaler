@@ -1,6 +1,7 @@
 ﻿namespace UniversalImageScaler.Image
 {
-    internal interface IVectorImage : IImage
+    internal interface IImage
     {
+        ImageFileType FileType { get; }
     }
 }
