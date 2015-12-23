@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Svg;
 
 namespace UniversalImageScaler.Image
 {
@@ -24,6 +25,11 @@ namespace UniversalImageScaler.Image
                     return ImageFileType.Jpeg;
                 }
 
+                if (name.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase))
+                {
+                    return ImageFileType.Bmp;
+                }
+
                 if (name.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
                 {
                     return ImageFileType.Pdf;
@@ -38,15 +44,13 @@ namespace UniversalImageScaler.Image
             return ImageFileType.None;
         }
 
-        public static bool IsSourceImageType(ImageFileType type)
+        public static bool IsBitmapType(ImageFileType type)
         {
             switch (type)
             {
                 case ImageFileType.Png:
                 case ImageFileType.Jpeg:
-                    return true;
-
-                case ImageFileType.Svg:
+                case ImageFileType.Bmp:
                     return true;
 
                 default:
@@ -54,21 +58,23 @@ namespace UniversalImageScaler.Image
             }
         }
 
-        public static bool IsSourceImageFile(string path)
+        public static bool IsSourceImageType(ImageFileType type)
         {
-            bool isImage = false;
-
-            if (!string.IsNullOrEmpty(path))
-            {
-                string name = Path.GetFileName(path);
-                ImageFileType type = ImageHelpers.GetFileType(name);
-                isImage = ImageHelpers.IsSourceImageType(type);
-            }
-
-            return isImage;
+            return ImageHelpers.IsBitmapType(type) ||
+                type == ImageFileType.Svg;
         }
 
-        public static BitmapImage LoadSourceImage(string path)
+        public static bool IsBitmapFile(string path)
+        {
+            return ImageHelpers.IsBitmapType(ImageHelpers.GetFileType(path));
+        }
+
+        public static bool IsSourceImageFile(string path)
+        {
+            return ImageHelpers.IsSourceImageType(ImageHelpers.GetFileType(path));
+        }
+
+        public static BitmapImage LoadBitmap(string path)
         {
             BitmapImage bitmap = new BitmapImage();
             bitmap.BeginInit();
@@ -80,12 +86,38 @@ namespace UniversalImageScaler.Image
             return bitmap;
         }
 
-        public static BitmapSource ScaleSourceImage(BitmapSource source, double width, double height)
+        public static IImage LoadSourceImage(string path)
+        {
+            ImageFileType fileType = ImageHelpers.GetFileType(path);
+            if (ImageHelpers.IsBitmapType(fileType))
+            {
+                BitmapSource source = ImageHelpers.LoadBitmap(path);
+                if (source != null)
+                {
+                    return new RasterImage(source, fileType);
+                }
+            }
+            else if (fileType == ImageFileType.Svg)
+            {
+                SvgDocument svg = SvgDocument.Open(path);
+                if (svg != null)
+                {
+                    return new SvgImage(svg);
+                }
+            }
+
+            throw new Exception("Couldn't load image file: " + path);
+        }
+
+        public static BitmapSource ScaleBitmap(BitmapSource source, double width, double height, ImageTransformType transform)
         {
             if (source.Format != PixelFormats.Bgra32)
             {
                 source = new FormatConvertedBitmap(source, PixelFormats.Bgra32, null, 0);
             }
+
+            width = Math.Ceiling(width);
+            height = Math.Ceiling(height);
 
             double sourceWidth = source.PixelWidth;
             double sourceHeight = source.PixelHeight;
@@ -116,10 +148,10 @@ namespace UniversalImageScaler.Image
                 sourceHeight = source.PixelHeight;
             }
 
-            return source;
+            return ImageHelpers.TransformImage(source, transform);
         }
 
-        public static void Save(BitmapSource source, ImageFileType type, string path)
+        public static void SaveBitmap(BitmapSource source, ImageFileType type, string path)
         {
             try
             {
@@ -141,11 +173,15 @@ namespace UniversalImageScaler.Image
             switch (type)
             {
                 case ImageFileType.Png:
-                    ImageHelpers.Save<PngBitmapEncoder>(source, path);
+                    ImageHelpers.SaveBitmap<PngBitmapEncoder>(source, path);
                     break;
 
                 case ImageFileType.Jpeg:
-                    ImageHelpers.Save<JpegBitmapEncoder>(source, path);
+                    ImageHelpers.SaveBitmap<JpegBitmapEncoder>(source, path);
+                    break;
+
+                case ImageFileType.Bmp:
+                    ImageHelpers.SaveBitmap<BmpBitmapEncoder>(source, path);
                     break;
 
                 default:
@@ -153,7 +189,7 @@ namespace UniversalImageScaler.Image
             }
         }
 
-        private static void Save<EncoderT>(BitmapSource source, string path) where EncoderT : BitmapEncoder, new()
+        private static void SaveBitmap<EncoderT>(BitmapSource source, string path) where EncoderT : BitmapEncoder, new()
         {
             BitmapEncoder encoder = new EncoderT();
             encoder.Frames.Add(BitmapFrame.Create(source));
@@ -166,7 +202,7 @@ namespace UniversalImageScaler.Image
             }
         }
 
-        public static BitmapSource TransformImage(BitmapSource source, ImageTransformType type)
+        private static BitmapSource TransformImage(BitmapSource source, ImageTransformType type)
         {
             switch (type)
             {

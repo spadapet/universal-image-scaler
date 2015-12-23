@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -41,6 +42,17 @@ namespace UniversalImageScaler.Utility
             {
                 return null;
             }
+        }
+
+        public static string GetFileName(this IVsHierarchy hierarchy, uint itemId)
+        {
+            string path;
+            if (hierarchy.GetCanonicalName(itemId, out path) == 0)
+            {
+                return path;
+            }
+
+            return string.Empty;
         }
 
         public static uint FindItemId(this IVsHierarchy hierarchy, string file)

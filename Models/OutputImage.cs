@@ -80,9 +80,19 @@ namespace UniversalImageScaler.Models
             get { return this.owner; }
         }
 
-        protected SourceImage Image
+        protected SourceImage SourceImage
         {
             get { return this.Owner.Owner; }
+        }
+
+        protected IImage Image
+        {
+            get { return this.SourceImage.Image; }
+        }
+
+        protected IFrame Frame
+        {
+            get { return this.SourceImage.Frame; }
         }
 
         protected void UpdateEnabled()

@@ -1,7 +1,10 @@
-﻿namespace UniversalImageScaler.Image
+﻿using System.Collections.Generic;
+
+namespace UniversalImageScaler.Image
 {
-    internal interface IImage
+    public interface IImage
     {
         ImageFileType FileType { get; }
+        IReadOnlyList<IFrame> Frames { get; }
     }
 }

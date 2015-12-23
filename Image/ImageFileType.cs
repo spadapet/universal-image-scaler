@@ -5,6 +5,7 @@
         None,
         Png,
         Jpeg,
+        Bmp,
         Pdf,
         Svg,
     }

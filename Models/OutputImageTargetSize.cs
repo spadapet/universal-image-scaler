@@ -1,4 +1,6 @@
-﻿namespace UniversalImageScaler.Models
+﻿using System.Windows;
+
+namespace UniversalImageScaler.Models
 {
     internal class OutputImageTargetSize : OutputImage
     {
@@ -61,8 +63,18 @@
         {
             get
             {
+                if (!base.ShouldEnable)
+                {
+                    return false;
+                }
 
-                return base.ShouldEnable && (this.Image.PixelWidth >= this.targetSize || this.Image.PixelHeight >= targetSize);
+                if (!this.Frame.PixelSize.HasValue)
+                {
+                    return true;
+                }
+
+                Size frameSize = this.Frame.PixelSize.Value;
+                return frameSize.Width >= this.targetSize || frameSize.Height >= this.targetSize;
             }
         }
     }

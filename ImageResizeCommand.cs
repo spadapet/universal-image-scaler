@@ -116,9 +116,9 @@ namespace UniversalImageScaler
 
         private void GenerateImage(OutputImage image)
         {
-            BitmapSource source = ImageHelpers.ScaleSourceImage(image.Owner.Owner.Image, image.PixelWidth, image.PixelHeight);
-            source = ImageHelpers.TransformImage(source, image.TransformType);
-            ImageHelpers.Save(source, image.OutputFileType, image.Path);
+            SourceImage sourceImage = image.Owner.Owner;
+            BitmapSource source = sourceImage.Frame.Render(image.PixelWidth, image.PixelHeight, image.TransformType);
+            ImageHelpers.SaveBitmap(source, image.OutputFileType, image.Path);
         }
 
         private void OnGeneratingSet(OutputSet set)

@@ -52,12 +52,15 @@
     <Compile Include="ImageResizeDialog.xaml.cs">
       <DependentUpon>ImageResizeDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Image\IRasterImage.cs" />
-    <Compile Include="Image\IVectorImage.cs" />
+    <Compile Include="Image\IFrame.cs" />
     <Compile Include="Image\IImage.cs" />
     <Compile Include="Image\ImageTransformType.cs" />
     <Compile Include="Image\ImageFileType.cs" />
-    <Compile Include="Image\IVectorImagePage.cs" />
+    <Compile Include="Image\RasterFrame.cs" />
+    <Compile Include="Image\RasterImage.cs" />
+    <Compile Include="Image\SvgFrame.cs" />
+    <Compile Include="Image\SvgImage.cs" />
+    <Compile Include="Models\Frames.cs" />
     <Compile Include="Models\OutputFeature.cs" />
     <Compile Include="Models\OutputImage.cs" />
     <Compile Include="Models\OutputImageScaleOptional10.cs" />

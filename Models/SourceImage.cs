@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.Shell.Interop;
 using UniversalImageScaler.Image;
 using UniversalImageScaler.Utility;
@@ -17,11 +16,14 @@ namespace UniversalImageScaler.Models
         private string path;
         private int pathScaleStart;
         private int pathScaleLength;
-        private BitmapSource image;
-        private ImageFileType imageType;
+        private IImage sourceImage;
+        private IFrame sourceFrame;
         private ObservableCollection<OutputFeature> features;
         private OutputFeature feature;
         private double scale;
+        private double customPixelWidth;
+        private double customPixelHeight;
+        private bool hasCustomSize;
         private bool scaleReadOnly;
         private bool showOptionalScales8;
         private bool showOptionalScales10;
@@ -36,8 +38,7 @@ namespace UniversalImageScaler.Models
             this.path = @"x:\test\image.scale-400.png";
             this.pathScaleStart = 13;
             this.pathScaleLength = 11;
-            this.image = OutputHelpers.CreateDesignTimeSourceImage();
-            this.imageType = ImageFileType.Png;
+            this.sourceImage = OutputHelpers.CreateDesignTimeSourceImage();
             this.scale = 4;
             this.features = new ObservableCollection<OutputFeature>();
 
@@ -87,8 +88,13 @@ namespace UniversalImageScaler.Models
             // Replace the lower-case name with the original case
             this.path = Path.Combine(Path.GetDirectoryName(this.path), (string)nameObj);
 
-            Match match = Regex.Match(this.path, @"\.scale-(?<scale>\d{3})\.");
-            if (match != null && match.Success && match.Index >= this.path.Length - Path.GetFileName(this.path).Length)
+            bool isBitmap = ImageHelpers.IsBitmapFile(this.path);
+            Match match = isBitmap
+                ? Regex.Match(this.path, @"\.scale-(?<scale>\d{3})\.")
+                : null;
+
+            if (match != null && match.Success &&
+                match.Index >= this.path.Length - Path.GetFileName(this.path).Length)
             {
                 this.pathScaleStart = match.Index;
                 this.pathScaleLength = match.Length;
@@ -107,15 +113,18 @@ namespace UniversalImageScaler.Models
                 this.pathScaleLength = 0;
 
                 // Just guess for now, the user can change it
-                this.scale = 2;
-                this.scaleReadOnly = false;
+                this.scale = isBitmap ? 2.0 : 1.0;
+                this.scaleReadOnly = !isBitmap;
+                this.hasCustomSize = !isBitmap;
+                this.customPixelWidth = !isBitmap ? 256.0 : 0.0;
+                this.customPixelHeight = !isBitmap ? 256.0 : 0.0;
             }
         }
 
         private void InitSourceImage()
         {
-            this.imageType = ImageHelpers.GetFileType(this.path);
-            this.image = ImageHelpers.LoadSourceImage(this.path);
+            this.sourceImage = ImageHelpers.LoadSourceImage(this.path);
+            this.sourceFrame = this.sourceImage.Frames.Count > 0 ? this.sourceImage.Frames[0] : null;
         }
 
         public VSITEMSELECTION Item
@@ -203,14 +212,19 @@ namespace UniversalImageScaler.Models
             }
         }
 
-        public ImageFileType ImageType
+        public IImage Image
         {
-            get { return this.imageType; }
+            get { return this.sourceImage; }
         }
 
-        public BitmapSource Image
+        public IFrame Frame
         {
-            get { return this.image; }
+            get { return this.sourceFrame; }
+        }
+
+        public IEnumerable<IFrame> Frames
+        {
+            get { return this.sourceImage.Frames; }
         }
 
         public double Scale
@@ -246,14 +260,35 @@ namespace UniversalImageScaler.Models
             get { return this.scaleReadOnly; }
         }
 
-        public double PixelWidth
+        public bool HasCustomSize
         {
-            get { return this.image != null ? this.image.PixelWidth : 0; }
+            get { return this.hasCustomSize; }
         }
 
-        public double PixelHeight
+        public double CustomPixelWidth
         {
-            get { return this.image != null ? this.image.PixelHeight : 0; }
+            get { return this.customPixelWidth; }
+            set
+            {
+                if (this.hasCustomSize && this.customPixelWidth != value)
+                {
+                    this.customPixelWidth = value;
+                    this.OnPropertyChanged(nameof(this.CustomPixelWidth));
+                }
+            }
+        }
+
+        public double CustomPixelHeight
+        {
+            get { return this.customPixelHeight; }
+            set
+            {
+                if (this.hasCustomSize && this.customPixelHeight != value)
+                {
+                    this.customPixelHeight = value;
+                    this.OnPropertyChanged(nameof(this.CustomPixelHeight));
+                }
+            }
         }
 
         public string FileName

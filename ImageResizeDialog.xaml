@@ -93,15 +93,19 @@
                                 Stretch="Uniform"
                                 Width="150"
                                 Height="150"
-                                Source="{Binding Image}" />
+                                Source="{Binding Frame.Thumbnail}" />
                         </Border>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10,0,0,0">
-                        <TextBlock Text="Source image size:" />
-                        <TextBlock Margin="0,5,0,0">
-                            <Run Text="{Binding PixelWidth, Mode=OneWay}" /><Run
+                        <TextBlock
+                            Text="Source image size:"
+                            Visibility="{Binding Frame.PixelSize.HasValue, Converter={StaticResource BoolToVisible}}" />
+                        <TextBlock
+                            Margin="0,5,0,0"
+                            Visibility="{Binding Frame.PixelSize.HasValue, Converter={StaticResource BoolToVisible}}">
+                            <Run Text="{Binding Frame.PixelSize.Width, Mode=OneWay}" /><Run
                                 Text="px x " /><Run
-                                Text="{Binding PixelHeight, Mode=OneWay}" /><Run
+                                Text="{Binding Frame.PixelSize.Height, Mode=OneWay}" /><Run
                                 Text="px" />
                         </TextBlock>
                         <TextBlock

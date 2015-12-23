@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UniversalImageScaler.Image;
@@ -34,7 +35,7 @@ namespace UniversalImageScaler.Models
             this.expanded = true;
             this.fixedSize = true;
             this.transformType = ImageTransformType.None;
-            this.outputType = owner.ImageType;
+            this.outputType = owner.Image.FileType;
             this.images = new ObservableCollection<OutputImage>();
 
             owner.PropertyChanged += this.OnOwnerPropertyChanged;
@@ -47,7 +48,7 @@ namespace UniversalImageScaler.Models
             this.description = string.Empty;
             this.expanded = true;
             this.transformType = ImageTransformType.None;
-            this.outputType = owner.ImageType;
+            this.outputType = owner.Image.FileType;
             this.images = new ObservableCollection<OutputImage>();
 
             this.UpdateSize();
@@ -380,8 +381,20 @@ namespace UniversalImageScaler.Models
 
         private void UpdateSize()
         {
-            this.Width = this.Owner.PixelWidth / this.Owner.Scale;
-            this.Height = this.Owner.PixelHeight / this.Owner.Scale;
+            if (this.Owner.HasCustomSize)
+            {
+                this.Width = this.Owner.CustomPixelWidth;
+                this.Height = this.Owner.CustomPixelHeight;
+            }
+            else if (this.Owner.Frame.PixelSize.HasValue)
+            {
+                this.Width = this.Owner.Frame.PixelSize.Value.Width / this.Owner.Scale;
+                this.Height = this.Owner.Frame.PixelSize.Value.Height / this.Owner.Scale;
+            }
+            else
+            {
+                Debug.Fail("Frame has no custom size and no actual size");
+            }
         }
     }
 }

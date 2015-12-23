@@ -10,7 +10,7 @@ namespace UniversalImageScaler.Utility
 {
     internal static class OutputHelpers
     {
-        public static BitmapSource CreateDesignTimeSourceImage()
+        public static IImage CreateDesignTimeSourceImage()
         {
             byte[] bytes = new byte[32 * 32 * 4];
             for (int i = 0; i < bytes.Length; i++)
@@ -21,7 +21,7 @@ namespace UniversalImageScaler.Utility
             WriteableBitmap image = new WriteableBitmap(32, 32, 96, 96, PixelFormats.Bgra32, null);
             image.WritePixels(new Int32Rect(0, 0, 32, 32), bytes, 32 * 4, 0);
             image.Freeze();
-            return image;
+            return new RasterImage(image, ImageFileType.Png);
         }
 
         public static void PopulateDesignTimeFeatures(SourceImage image)

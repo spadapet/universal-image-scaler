@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Windows;
 
 namespace UniversalImageScaler.Models
 {
@@ -51,10 +52,21 @@ namespace UniversalImageScaler.Models
         {
             get
             {
+                if (!base.ShouldEnable)
+                {
+                    return false;
+                }
+
+                if (!this.Frame.PixelSize.HasValue)
+                {
+                    return true;
+                }
+
                 double width = this.scale * this.Owner.Width;
                 double height = this.scale * this.Owner.Height;
+                Size frameSize = this.Frame.PixelSize.Value;
 
-                return base.ShouldEnable && (this.Image.PixelWidth >= width || this.Image.PixelHeight >= height);
+                return frameSize.Width >= width || frameSize.Height >= height;
             }
         }
 
