@@ -52,6 +52,11 @@
     <Compile Include="ImageResizeDialog.xaml.cs">
       <DependentUpon>ImageResizeDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Image\IRasterImage.cs" />
+    <Compile Include="Image\IVectorImage.cs" />
+    <Compile Include="Image\IImage.cs" />
+    <Compile Include="Image\ImageTransformType.cs" />
+    <Compile Include="Image\ImageFileType.cs" />
     <Compile Include="Models\OutputFeature.cs" />
     <Compile Include="Models\OutputImage.cs" />
     <Compile Include="Models\OutputImageScaleOptional10.cs" />
@@ -66,7 +71,7 @@
     <Compile Include="Utility\BooleanToCollapsedConverter.cs" />
     <Compile Include="Utility\DteHelpers.cs" />
     <Compile Include="Utility\OutputHelpers.cs" />
-    <Compile Include="Utility\ImageHelpers.cs" />
+    <Compile Include="Image\ImageHelpers.cs" />
     <Compile Include="Models\ModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\SelectionHelpers.cs" />

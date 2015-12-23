@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using UniversalImageScaler.Utility;
+using UniversalImageScaler.Image;
 
 namespace UniversalImageScaler.Models
 {

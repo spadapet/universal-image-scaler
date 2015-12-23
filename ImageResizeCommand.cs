@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Linq;
@@ -7,6 +6,7 @@ using System.Threading;
 using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using UniversalImageScaler.Image;
 using UniversalImageScaler.Models;
 using UniversalImageScaler.Utility;
 using OLECMDF = Microsoft.VisualStudio.OLE.Interop.OLECMDF;

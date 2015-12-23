@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
+using UniversalImageScaler.Image;
 
 namespace UniversalImageScaler.Utility
 {

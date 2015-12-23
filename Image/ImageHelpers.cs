@@ -5,23 +5,8 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace UniversalImageScaler.Utility
+namespace UniversalImageScaler.Image
 {
-    public enum ImageTransformType
-    {
-        None,
-        WhiteOnly,
-    }
-
-    public enum ImageFileType
-    {
-        None,
-        Png,
-        Jpeg,
-        Pdf,
-        Svg,
-    }
-
     internal static class ImageHelpers
     {
         public static ImageFileType GetFileType(string name)
@@ -59,6 +44,9 @@ namespace UniversalImageScaler.Utility
             {
                 case ImageFileType.Png:
                 case ImageFileType.Jpeg:
+                    return true;
+
+                case ImageFileType.Svg:
                     return true;
 
                 default:

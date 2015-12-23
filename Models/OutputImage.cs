@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-using UniversalImageScaler.Utility;
+using UniversalImageScaler.Image;
 
 namespace UniversalImageScaler.Models
 {
