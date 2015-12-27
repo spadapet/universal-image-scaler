@@ -58,14 +58,17 @@ namespace UniversalImageScaler.Image
             pixelWidth = Math.Ceiling(pixelWidth);
             pixelHeight = Math.Ceiling(pixelHeight);
 
-            using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap((int)pixelWidth, (int)pixelHeight))
+            System.Drawing.SizeF size = this.svg.GetDimensions();
+            double scale = Math.Min(pixelWidth / size.Width, pixelHeight / size.Height);
+            double bitmapWidth = Math.Ceiling(size.Width * scale);
+            double bitmapHeight = Math.Ceiling(size.Height * scale);
+
+            using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap((int)bitmapWidth, (int)bitmapHeight))
             using (ISvgRenderer render = SvgRenderer.FromImage(bitmap))
             using (MemoryStream stream = new MemoryStream())
             {
                 render.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-
-                System.Drawing.SizeF size = this.svg.GetDimensions();
-                render.ScaleTransform((float)pixelWidth / size.Width, (float)pixelHeight / size.Height);
+                render.ScaleTransform((float)scale, (float)scale);
                 this.svg.Draw(render);
 
                 bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
@@ -78,7 +81,7 @@ namespace UniversalImageScaler.Image
                 bitmapImage.EndInit();
                 bitmapImage.Freeze();
 
-                return bitmapImage;
+                return ImageHelpers.ScaleBitmap(bitmapImage, (int)pixelWidth, (int)pixelHeight, transform);
             }
         }
     }
