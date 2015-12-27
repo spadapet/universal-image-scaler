@@ -90,11 +90,24 @@ namespace UniversalImageScaler.Utility
 
         private static OutputFeature InitScaleFeature(SourceImage source)
         {
-            OutputFeature feature = new OutputFeature("Smaller scales of the source image")
+            OutputFeature feature;
+
+            if (ImageHelpers.IsBitmapType(source.Image.FileType))
             {
-                Tooltip = "The scale of the source image is determined by '.scale-XXX.' in the filename. Otherwise you can set it above.",
-                AllowChangeScale = true,
-            };
+                feature = new OutputFeature("Smaller scales of the source image")
+                {
+                    Tooltip = "The scale of the source image is determined by '.scale-XXX.' in the filename. Otherwise you can set it above.",
+                    AllowChangeScale = true,
+                };
+            }
+            else
+            {
+                feature = new OutputFeature("Raster images from the source vector image")
+                {
+                    Tooltip = "Any size image can be generated from the source vector image. Set the size for the 100% scale in the edit boxes above.",
+                    AllowChangeSize = true,
+                };
+            }
 
             string setName = Path.GetFileName(source.UnscaledPath);
             OutputSet set = new OutputSet(source, setName);

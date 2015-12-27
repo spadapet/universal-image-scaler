@@ -58,6 +58,19 @@ namespace UniversalImageScaler.Image
             }
         }
 
+        public static bool IsVectorType(ImageFileType type)
+        {
+            switch (type)
+            {
+                case ImageFileType.Svg:
+                case ImageFileType.Pdf:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
         public static bool IsSourceImageType(ImageFileType type)
         {
             return ImageHelpers.IsBitmapType(type) ||

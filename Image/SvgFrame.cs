@@ -21,6 +21,11 @@ namespace UniversalImageScaler.Image
             get { return null; }
         }
 
+        public double WidthOverHeight
+        {
+            get { return (double)this.svg.ViewBox.Width / (double)this.svg.ViewBox.Height; }
+        }
+
         public BitmapSource Thumbnail
         {
             get

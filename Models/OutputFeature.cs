@@ -8,6 +8,7 @@ namespace UniversalImageScaler.Models
         private string name;
         private string description;
         private bool allowChangeScale;
+        private bool allowChangeSize;
         private ObservableCollection<OutputSet> sets;
 
         public OutputFeature(string name)
@@ -52,6 +53,19 @@ namespace UniversalImageScaler.Models
                 {
                     this.allowChangeScale = value;
                     this.OnPropertyChanged(nameof(this.AllowChangeScale));
+                }
+            }
+        }
+
+        public bool AllowChangeSize
+        {
+            get { return this.allowChangeSize; }
+            set
+            {
+                if (this.allowChangeSize != value)
+                {
+                    this.allowChangeSize = value;
+                    this.OnPropertyChanged(nameof(this.AllowChangeSize));
                 }
             }
         }

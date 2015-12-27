@@ -99,13 +99,13 @@
                     <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10,0,0,0">
                         <TextBlock
                             Text="Source image size:"
-                            Visibility="{Binding Frame.PixelSize.HasValue, Converter={StaticResource BoolToVisible}}" />
+                            Visibility="{Binding FrameHasPixelSize, Converter={StaticResource BoolToVisible}}" />
                         <TextBlock
                             Margin="0,5,0,0"
-                            Visibility="{Binding Frame.PixelSize.HasValue, Converter={StaticResource BoolToVisible}}">
-                            <Run Text="{Binding Frame.PixelSize.Width, Mode=OneWay}" /><Run
+                            Visibility="{Binding FrameHasPixelSize, Converter={StaticResource BoolToVisible}}">
+                            <Run Text="{Binding FramePixelWidth, Mode=OneWay}" /><Run
                                 Text="px x " /><Run
-                                Text="{Binding Frame.PixelSize.Height, Mode=OneWay}" /><Run
+                                Text="{Binding FramePixelHeight, Mode=OneWay}" /><Run
                                 Text="px" />
                         </TextBlock>
                         <TextBlock
@@ -118,7 +118,6 @@
                             Visibility="{Binding Feature.AllowChangeScale, Converter={StaticResource BoolToVisible}}">
                             <TextBox
                                 Width="50"
-                                HorizontalAlignment="Left"
                                 IsEnabled="{Binding ScaleReadOnly, Converter={StaticResource BoolInverse}}"
                                 Text="{Binding Scale100, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                 <TextBox.Style>
@@ -132,6 +131,18 @@
                                 </TextBox.Style>
                             </TextBox>
                             <TextBlock VerticalAlignment="Center" Text="%" Margin="2,0,0,0" />
+                        </StackPanel>
+                        <TextBlock
+                            Text="Width x Height for the 100% scale bitmap:"
+                            Visibility="{Binding Feature.AllowChangeSize, Converter={StaticResource BoolToVisible}}" />
+                        <StackPanel
+                            Orientation="Horizontal"
+                            Margin="0,5,0,0"
+                            Visibility="{Binding Feature.AllowChangeSize, Converter={StaticResource BoolToVisible}}">
+                            <TextBox Width="50" Text="{Binding CustomPixelWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock VerticalAlignment="Center" Text="px x " Margin="2,0" />
+                            <TextBox Width="50" Text="{Binding CustomPixelHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock VerticalAlignment="Center" Text="px" Margin="2,0" />
                         </StackPanel>
                     </StackPanel>
                 </Grid>

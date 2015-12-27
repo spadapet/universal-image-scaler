@@ -125,6 +125,11 @@ namespace UniversalImageScaler.Models
         {
             this.sourceImage = ImageHelpers.LoadSourceImage(this.path);
             this.sourceFrame = this.sourceImage.Frames.Count > 0 ? this.sourceImage.Frames[0] : null;
+
+            if (this.Frame != null && this.CustomPixelWidth != 0.0)
+            {
+                this.customPixelHeight = Math.Ceiling(this.CustomPixelWidth / this.Frame.WidthOverHeight);
+            }
         }
 
         public VSITEMSELECTION Item
@@ -227,6 +232,21 @@ namespace UniversalImageScaler.Models
             get { return this.sourceImage.Frames; }
         }
 
+        public bool FrameHasPixelSize
+        {
+            get { return this.Frame.PixelSize.HasValue; }
+        }
+
+        public double FramePixelWidth
+        {
+            get { return this.Frame.PixelSize.HasValue ? this.Frame.PixelSize.Value.Width : 0.0; }
+        }
+
+        public double FramePixelHeight
+        {
+            get { return this.Frame.PixelSize.HasValue ? this.Frame.PixelSize.Value.Height: 0.0; }
+        }
+
         public double Scale
         {
             get { return this.scale; }
@@ -274,6 +294,9 @@ namespace UniversalImageScaler.Models
                 {
                     this.customPixelWidth = value;
                     this.OnPropertyChanged(nameof(this.CustomPixelWidth));
+
+                    this.customPixelHeight = Math.Ceiling(value / this.Frame.WidthOverHeight);
+                    this.OnPropertyChanged(nameof(this.CustomPixelHeight));
                 }
             }
         }
@@ -287,6 +310,9 @@ namespace UniversalImageScaler.Models
                 {
                     this.customPixelHeight = value;
                     this.OnPropertyChanged(nameof(this.CustomPixelHeight));
+
+                    this.customPixelWidth = Math.Ceiling(value * this.Frame.WidthOverHeight);
+                    this.OnPropertyChanged(nameof(this.CustomPixelWidth));
                 }
             }
         }

@@ -17,6 +17,11 @@ namespace UniversalImageScaler.Image
             get { return new Size(this.source.PixelWidth, this.source.PixelHeight); }
         }
 
+        public double WidthOverHeight
+        {
+            get { return (double)this.source.PixelWidth / (double)this.source.PixelHeight; }
+        }
+
         public BitmapSource Thumbnail
         {
             get { return this.source; }
