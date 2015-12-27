@@ -109,8 +109,8 @@ namespace UniversalImageScaler.Utility
                 };
             }
 
-            string setName = Path.GetFileName(source.UnscaledPath);
-            OutputSet set = new OutputSet(source, setName);
+            OutputSet set = new OutputSet(source, string.Empty);
+            set.Name = Path.GetFileName(set.UnscaledPath);
 
             foreach (OutputImage image in OutputHelpers.CreateOutputImages(set, false))
             {

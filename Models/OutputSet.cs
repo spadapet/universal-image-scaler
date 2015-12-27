@@ -35,7 +35,9 @@ namespace UniversalImageScaler.Models
             this.expanded = true;
             this.fixedSize = true;
             this.transformType = ImageTransformType.None;
-            this.outputType = owner.Image.FileType;
+            this.outputType = ImageHelpers.IsBitmapType(owner.Image.FileType)
+                ? owner.Image.FileType
+                : ImageFileType.DefaultRasterize;
             this.images = new ObservableCollection<OutputImage>();
 
             owner.PropertyChanged += this.OnOwnerPropertyChanged;
@@ -48,7 +50,9 @@ namespace UniversalImageScaler.Models
             this.description = string.Empty;
             this.expanded = true;
             this.transformType = ImageTransformType.None;
-            this.outputType = owner.Image.FileType;
+            this.outputType = ImageHelpers.IsBitmapType(owner.Image.FileType)
+                ? owner.Image.FileType
+                : ImageFileType.DefaultRasterize;
             this.images = new ObservableCollection<OutputImage>();
 
             this.UpdateSize();
@@ -82,6 +86,14 @@ namespace UniversalImageScaler.Models
         public string Name
         {
             get { return this.name; }
+            set
+            {
+                if (this.name != value)
+                {
+                    this.name = value;
+                    this.OnPropertyChanged(nameof(this.Name));
+                }
+            }
         }
 
         public string FileNameOverride
@@ -234,6 +246,7 @@ namespace UniversalImageScaler.Models
                 {
                     this.outputType = value;
                     this.OnPropertyChanged(nameof(this.OutputFileType));
+                    this.OnPropertyChanged(nameof(this.UnscaledPath));
                 }
             }
         }
@@ -251,7 +264,7 @@ namespace UniversalImageScaler.Models
 
         public string GetScaledPath(double scale)
         {
-            return this.Owner.GetScaledPath(scale, this.FileNameOverride);
+            return this.Owner.GetScaledPath(scale, this.FileNameOverride, this.OutputFileType);
         }
 
         public string GetTargetSizePath(double targetSize, bool unplated)

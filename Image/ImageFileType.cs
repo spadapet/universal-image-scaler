@@ -8,5 +8,7 @@
         Bmp,
         Pdf,
         Svg,
+
+        DefaultRasterize = Png,
     }
 }

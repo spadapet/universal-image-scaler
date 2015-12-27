@@ -23,7 +23,24 @@ namespace UniversalImageScaler.Image
 
         public double WidthOverHeight
         {
-            get { return (double)this.svg.ViewBox.Width / (double)this.svg.ViewBox.Height; }
+            get
+            {
+                if (this.svg.ViewBox.Width == 0 || this.svg.ViewBox.Height == 0)
+                {
+                    if (this.svg.Height == 0)
+                    {
+                        return 1.0;
+                    }
+                    else
+                    {
+                        return this.svg.Width / this.svg.Height;
+                    }
+                }
+                else
+                {
+                    return this.svg.ViewBox.Width / this.svg.ViewBox.Height;
+                }
+            }
         }
 
         public BitmapSource Thumbnail
@@ -36,7 +53,10 @@ namespace UniversalImageScaler.Image
                     {
                         if (this.thumbnail == null)
                         {
-                            this.thumbnail = this.Render(256, 256, ImageTransformType.None);
+                            double width = this.WidthOverHeight >= 1.0 ? 256.0 : 256.0 / this.WidthOverHeight;
+                            double height = this.WidthOverHeight >= 1.0 ? 256.0 * this.WidthOverHeight : 256.0;
+
+                            this.thumbnail = this.Render(width, height, ImageTransformType.None);
                         }
                     }
                 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -327,7 +328,7 @@ namespace UniversalImageScaler.Models
             get { return this.GetScaledPath(0); }
         }
 
-        public string GetScaledPath(double scale, string fileNameOverride = null)
+        public string GetScaledPath(double scale, string fileNameOverride = null, ImageFileType fileTypeOverride = ImageFileType.None)
         {
             string path;
             int insertPos = -1;
@@ -349,6 +350,36 @@ namespace UniversalImageScaler.Models
             if (insertPos != -1 && scale > 0)
             {
                 path = path.Insert(insertPos, $".scale-{(int)(scale * 100.0)}");
+            }
+
+            if (fileTypeOverride != ImageFileType.None && fileTypeOverride != this.Image.FileType)
+            {
+                string oldExtension = Path.GetExtension(path);
+                string newExtension = oldExtension;
+
+                switch (fileTypeOverride)
+                {
+                    case ImageFileType.Bmp:
+                        newExtension = ".bmp";
+                        break;
+
+                    case ImageFileType.Jpeg:
+                        newExtension = ".jpg";
+                        break;
+
+                    case ImageFileType.Png:
+                        newExtension = ".png";
+                        break;
+
+                    default:
+                        Debug.Fail("Can't save with file extension for: " + fileTypeOverride);
+                        break;
+                }
+
+                if (oldExtension != newExtension)
+                {
+                    path = path.Remove(path.Length - oldExtension.Length, oldExtension.Length) + newExtension;
+                }
             }
 
             return path;
