@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Svg;
+using UniversalImageScaler.Utility;
 
 namespace UniversalImageScaler.Image
 {
@@ -25,21 +26,8 @@ namespace UniversalImageScaler.Image
         {
             get
             {
-                if (this.svg.ViewBox.Width == 0 || this.svg.ViewBox.Height == 0)
-                {
-                    if (this.svg.Height == 0)
-                    {
-                        return 1.0;
-                    }
-                    else
-                    {
-                        return this.svg.Width / this.svg.Height;
-                    }
-                }
-                else
-                {
-                    return this.svg.ViewBox.Width / this.svg.ViewBox.Height;
-                }
+                System.Drawing.SizeF size = this.svg.GetDimensions();
+                return size.Height != 0.0 ? size.Width / size.Height : 0.0;
             }
         }
 
@@ -53,8 +41,8 @@ namespace UniversalImageScaler.Image
                     {
                         if (this.thumbnail == null)
                         {
-                            double width = this.WidthOverHeight >= 1.0 ? 256.0 : 256.0 / this.WidthOverHeight;
-                            double height = this.WidthOverHeight >= 1.0 ? 256.0 * this.WidthOverHeight : 256.0;
+                            double width = this.WidthOverHeight >= 1.0 ? 256.0 : 256.0 * this.WidthOverHeight;
+                            double height = this.WidthOverHeight >= 1.0 ? 256.0 / this.WidthOverHeight : 256.0;
 
                             this.thumbnail = this.Render(width, height, ImageTransformType.None);
                         }
@@ -70,26 +58,28 @@ namespace UniversalImageScaler.Image
             pixelWidth = Math.Ceiling(pixelWidth);
             pixelHeight = Math.Ceiling(pixelHeight);
 
-            System.Drawing.Bitmap bitmap = this.svg.Draw((int)pixelWidth, (int)pixelHeight);
-            if (bitmap != null)
+            using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap((int)pixelWidth, (int)pixelHeight))
+            using (ISvgRenderer render = SvgRenderer.FromImage(bitmap))
+            using (MemoryStream stream = new MemoryStream())
             {
-                using (MemoryStream stream = new MemoryStream())
-                {
-                    bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                    stream.Seek(0, SeekOrigin.Begin);
+                render.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 
-                    BitmapImage bitmapImage = new BitmapImage();
-                    bitmapImage.BeginInit();
-                    bitmapImage.StreamSource = stream;
-                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmapImage.EndInit();
-                    bitmapImage.Freeze();
+                System.Drawing.SizeF size = this.svg.GetDimensions();
+                render.ScaleTransform((float)pixelWidth / size.Width, (float)pixelHeight / size.Height);
+                this.svg.Draw(render);
 
-                    return bitmapImage;
-                }
+                bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                stream.Seek(0, SeekOrigin.Begin);
+
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = stream;
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+                bitmapImage.Freeze();
+
+                return bitmapImage;
             }
-
-            return null;
         }
     }
 }

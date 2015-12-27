@@ -113,10 +113,7 @@ namespace UniversalImageScaler.Image
             else if (fileType == ImageFileType.Svg)
             {
                 SvgDocument svg = SvgDocument.Open(path);
-                if (svg != null)
-                {
-                    return new SvgImage(svg);
-                }
+                return new SvgImage(svg);
             }
 
             throw new Exception("Couldn't load image file: " + path);
