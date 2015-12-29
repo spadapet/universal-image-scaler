@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.Design;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Windows.Media.Imaging;
@@ -35,19 +34,27 @@ namespace UniversalImageScaler
                 {
                     using (SourceImage source = new SourceImage(sel))
                     {
+                        TelemetryHelpers.TrackDialogOpen(source);
                         ImageResizeDialog dialog = new ImageResizeDialog(source);
                         bool? result = dialog.ShowModal();
 
                         if (result == true)
                         {
+                            TelemetryHelpers.TrackDialogOk(source);
                             await GenerateImagesMainThread(source);
+                            TelemetryHelpers.TrackGenerateSuccess(source);
+                        }
+                        else
+                        {
+                            TelemetryHelpers.TrackDialogCancel(source);
                         }
                     }
+
+                    TelemetryHelpers.Flush();
                 }
                 catch (Exception ex)
                 {
-                    Debug.Fail(ex.Message);
-                    ImageResizePackage.Instance.TelemetryClient.TrackException(ex);
+                    TelemetryHelpers.TrackException(ex);
                 }
             }
         }

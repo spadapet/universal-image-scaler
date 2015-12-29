@@ -43,7 +43,10 @@ namespace UniversalImageScaler
 
         protected override void Initialize()
         {
-            ImageResizePackage.Instance = this;
+            if (ImageResizePackage.Instance == null)
+            {
+                ImageResizePackage.Instance = this;
+            }
 
             InitializeTelemetry();
             base.Initialize();

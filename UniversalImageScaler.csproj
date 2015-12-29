@@ -79,6 +79,7 @@
     <Compile Include="Models\ModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\SelectionHelpers.cs" />
+    <Compile Include="Utility\TelemetryHelpers.cs" />
     <Compile Include="Utility\WpfHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -221,9 +222,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\preview.png">
+    <None Include="Resources\preview.png">
       <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
+    </None>
     <Resource Include="Resources\info.png" />
   </ItemGroup>
   <ItemGroup>

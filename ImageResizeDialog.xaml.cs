@@ -24,20 +24,6 @@ namespace UniversalImageScaler
             this.DataContext = item;
 
             InitializeComponent();
-
-            Dictionary<string, string> eventProps = new Dictionary<string, string>()
-            {
-                [nameof(item.Image.FileType)] = item.Image.FileType.ToString(),
-                [nameof(item.CustomPixelHeight)] = item.CustomPixelHeight.ToString(),
-                [nameof(item.CustomPixelWidth)] = item.CustomPixelWidth.ToString(),
-                [nameof(item.FrameHasPixelSize)] = item.FrameHasPixelSize.ToString(),
-                [nameof(item.FramePixelWidth)] = item.FramePixelWidth.ToString(),
-                [nameof(item.FramePixelHeight)] = item.FramePixelHeight.ToString(),
-                [nameof(item.HasCustomSize)] = item.HasCustomSize.ToString(),
-                [nameof(item.Scale)] = item.Scale.ToString(),
-            };
-
-            ImageResizePackage.Instance.TelemetryClient.TrackEvent("ShowImageResizeDialog", eventProps);
         }
 
         protected override void InvokeDialogHelp()

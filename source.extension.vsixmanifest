@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="UniversalImageScaler.Peter Spada.7d4f0e00-00ae-49fa-bfe7-d3ffb5384d50" Version="1.2" Language="en-US" Publisher="Peter Spada" />
+    <Identity Id="UniversalImageScaler.Peter Spada.7d4f0e00-00ae-49fa-bfe7-d3ffb5384d50" Version="1.3" Language="en-US" Publisher="Peter Spada" />
     <DisplayName>Windows Universal App Image Scaler</DisplayName>
     <Description xml:space="preserve">This extension takes large source images and creates resized copies that are used in Windows Universal Apps. It can also create all of the manifest images like app logos and splash screens. Right click an image file to access this extension.</Description>
     <MoreInfo>https://github.com/spadapet/universal-image-scaler</MoreInfo>
