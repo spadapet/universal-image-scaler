@@ -47,6 +47,7 @@ namespace UniversalImageScaler
                 catch (Exception ex)
                 {
                     Debug.Fail(ex.Message);
+                    ImageResizePackage.Instance.TelemetryClient.TrackException(ex);
                 }
             }
         }
