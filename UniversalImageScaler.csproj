@@ -60,7 +60,6 @@
     <Compile Include="Image\RasterImage.cs" />
     <Compile Include="Image\SvgFrame.cs" />
     <Compile Include="Image\SvgImage.cs" />
-    <Compile Include="Models\Frames.cs" />
     <Compile Include="Models\OutputFeature.cs" />
     <Compile Include="Models\OutputImage.cs" />
     <Compile Include="Models\OutputImageScaleOptional10.cs" />
