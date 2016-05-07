@@ -59,12 +59,13 @@ namespace UniversalImageScaler.Utility
             OutputFeature squareFeature = OutputHelpers.InitSquareManifestFeature(source);
             OutputFeature wideFeature = OutputHelpers.InitWideManifestFeature(source);
             OutputFeature bothFeature = null;
+            OutputFeature promoFeature = OutputHelpers.InitPromotionalFeature(source);
 
             if (squareFeature != null && wideFeature != null)
             {
                 bothFeature = new OutputFeature("Square and wide manifest images (for app store)")
                 {
-                    Tooltip = "Recommended source image size: 1240px x 1240px",
+                    Tooltip = "Recommended source image size: 1240pxx1240px",
                 };
 
                 foreach (OutputSet set in squareFeature.Sets)
@@ -82,6 +83,7 @@ namespace UniversalImageScaler.Utility
             source.AddFeature(squareFeature);
             source.AddFeature(wideFeature);
             source.AddFeature(bothFeature);
+            source.AddFeature(promoFeature);
 
             source.Feature = source.ScaleReadOnly
                 ? scaleFeature
@@ -213,6 +215,44 @@ namespace UniversalImageScaler.Utility
 
             foreach (OutputSet set in sets)
             {
+                foreach (OutputImage image in OutputHelpers.CreateOutputImages(set, true))
+                {
+                    set.AddImage(image);
+                }
+
+                feature.AddSet(set);
+            }
+
+            return feature;
+        }
+
+        private static OutputFeature InitPromotionalFeature(SourceImage source)
+        {
+            OutputFeature feature = new OutputFeature("Promotional images (for app store)")
+            {
+                Tooltip = "Recommended source image size: 2400px x 1200px",
+            };
+
+            const string tooltip = "This is promo artwork for when you publish your app to the store on developer.microsoft.com";
+
+            OutputSet[] sets = new OutputSet[]
+            {
+                new OutputSet(source, "Promo 358x173", 358, 173),
+                new OutputSet(source, "Promo 358x358", 358, 358),
+                new OutputSet(source, "Promo 1000x800", 1000, 800),
+                new OutputSet(source, "Promo 414x180", 410, 180),
+                new OutputSet(source, "Promo 414x468", 414, 468),
+                new OutputSet(source, "Promo 558x558", 558, 558),
+                new OutputSet(source, "Promo 558x756", 558, 756),
+                new OutputSet(source, "Promo 846x468", 846, 468),
+                new OutputSet(source, "Promo 2400x1200", 2400, 1200),
+            };
+
+            foreach (OutputSet set in sets)
+            {
+                set.Tooltip = tooltip;
+                set.OutputFileType = ImageFileType.Png;
+
                 foreach (OutputImage image in OutputHelpers.CreateOutputImages(set, true))
                 {
                     set.AddImage(image);
