@@ -414,6 +414,11 @@ namespace UniversalImageScaler.Models
             return path;
         }
 
+        public string GetCustomOutputPath(string customFileName, ImageFileType fileType = ImageFileType.None)
+        {
+            return this.GetScaledPath(0, customFileName, fileType);
+        }
+
         public string FullDir
         {
             get { return Path.GetDirectoryName(this.path); }

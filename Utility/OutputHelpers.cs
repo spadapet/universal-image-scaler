@@ -233,32 +233,30 @@ namespace UniversalImageScaler.Utility
                 Tooltip = "Recommended source image size: 2400px x 1200px",
             };
 
-            const string tooltip = "This is promo artwork for when you publish your app to the store on developer.microsoft.com";
-
-            OutputSet[] sets = new OutputSet[]
+            OutputSet set = new OutputSet(source, "Store promo art")
             {
-                new OutputSet(source, "Promo 358x173", 358, 173),
-                new OutputSet(source, "Promo 358x358", 358, 358),
-                new OutputSet(source, "Promo 1000x800", 1000, 800),
-                new OutputSet(source, "Promo 414x180", 410, 180),
-                new OutputSet(source, "Promo 414x468", 414, 468),
-                new OutputSet(source, "Promo 558x558", 558, 558),
-                new OutputSet(source, "Promo 558x756", 558, 756),
-                new OutputSet(source, "Promo 846x468", 846, 468),
-                new OutputSet(source, "Promo 2400x1200", 2400, 1200),
+                Tooltip = "This is promo artwork for when you publish your app to the store on developer.microsoft.com",
+                OutputFileType = ImageFileType.Png,
             };
 
-            foreach (OutputSet set in sets)
+            feature.AddSet(set);
+
+            OutputImage[] images = new OutputImage[]
             {
-                set.Tooltip = tooltip;
-                set.OutputFileType = ImageFileType.Png;
+                new OutputImagePromoSize(set, 358, 173),
+                new OutputImagePromoSize(set, 358, 358),
+                new OutputImagePromoSize(set, 1000, 800),
+                new OutputImagePromoSize(set, 414, 180),
+                new OutputImagePromoSize(set, 414, 468),
+                new OutputImagePromoSize(set, 558, 558),
+                new OutputImagePromoSize(set, 558, 756),
+                new OutputImagePromoSize(set, 846, 468),
+                new OutputImagePromoSize(set, 2400, 1200),
+            };
 
-                foreach (OutputImage image in OutputHelpers.CreateOutputImages(set, true))
-                {
-                    set.AddImage(image);
-                }
-
-                feature.AddSet(set);
+            foreach (OutputImage image in images)
+            {
+                set.AddImage(image);
             }
 
             return feature;

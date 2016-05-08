@@ -66,6 +66,7 @@
     <Compile Include="Models\OutputImageScaleOptional10.cs" />
     <Compile Include="Models\OutputImageScaleOptional8.cs" />
     <Compile Include="Models\OutputImageScale.cs" />
+    <Compile Include="Models\OutputImagePromoSize.cs" />
     <Compile Include="Models\OutputImageTargetSizeOptional10.cs" />
     <Compile Include="Models\OutputSet.cs" />
     <Compile Include="Models\SourceImage.cs" />

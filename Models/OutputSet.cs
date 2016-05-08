@@ -272,6 +272,11 @@ namespace UniversalImageScaler.Models
             return this.Owner.GetTargetSizePath(targetSize, unplated, this.FileNameOverride);
         }
 
+        public string GetCustomOutputPath(string customFileName)
+        {
+            return this.Owner.GetCustomOutputPath(customFileName, this.OutputFileType);
+        }
+
         private void SetGenerate(bool? value, bool updateImages)
         {
             if (this.generate != value)
