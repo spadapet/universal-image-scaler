@@ -217,9 +217,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <None Include="Resources\preview.png">
+    <Content Include="Resources\preview.png">
       <IncludeInVSIX>true</IncludeInVSIX>
-    </None>
+    </Content>
     <Resource Include="Resources\info.png" />
   </ItemGroup>
   <ItemGroup>
