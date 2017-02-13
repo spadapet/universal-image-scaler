@@ -9,6 +9,7 @@ namespace UniversalImageScaler.Models
         private string description;
         private bool allowChangeScale;
         private bool allowChangeSize;
+        private bool checkFileSize;
         private ObservableCollection<OutputSet> sets;
 
         public OutputFeature(string name)
@@ -66,6 +67,19 @@ namespace UniversalImageScaler.Models
                 {
                     this.allowChangeSize = value;
                     this.OnPropertyChanged(nameof(this.AllowChangeSize));
+                }
+            }
+        }
+
+        public bool CheckFileSize
+        {
+            get { return this.checkFileSize; }
+            set
+            {
+                if (this.checkFileSize != value)
+                {
+                    this.checkFileSize = value;
+                    this.OnPropertyChanged(nameof(this.CheckFileSize));
                 }
             }
         }

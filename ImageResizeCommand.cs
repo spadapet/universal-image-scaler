@@ -10,6 +10,8 @@ using UniversalImageScaler.Models;
 using UniversalImageScaler.Utility;
 using OLECMDF = Microsoft.VisualStudio.OLE.Interop.OLECMDF;
 using Task = System.Threading.Tasks.Task;
+using System.IO;
+using System.Collections.Generic;
 
 namespace UniversalImageScaler
 {
@@ -90,6 +92,23 @@ namespace UniversalImageScaler
             CommonMessagePumpExitCode code = pump.ModalWaitForHandles(((IAsyncResult)task).AsyncWaitHandle);
             tokenSource.Cancel();
             await task;
+
+            List<OutputImage> largeImages = new List<OutputImage>();
+            if (source.Feature != null && source.Feature.CheckFileSize)
+            {
+                foreach (OutputImage image in source.ImagesToGenerate)
+                {
+                    if (image.FileSizeTooLarge)
+                    {
+                        largeImages.Add(image);
+                    }
+                }
+            }
+
+            if (largeImages.Count > 0)
+            {
+                // TODO: Stuff
+            }
         }
 
         private void GenerateImagesBackgroundThread(SourceImage source, CancellationToken token, CommonMessagePump mainThreadPump)
@@ -124,9 +143,26 @@ namespace UniversalImageScaler
 
         private void GenerateImage(OutputImage image)
         {
+            long oldSize = 0;
+            long newSize = 0;
+
+            if (File.Exists(image.Path))
+            {
+                FileInfo info = new FileInfo(image.Path);
+                oldSize = info.Length;
+            }
+
             SourceImage sourceImage = image.Owner.Owner;
             BitmapSource source = sourceImage.Frame.Render(image.PixelWidth, image.PixelHeight, image.TransformType);
             ImageHelpers.SaveBitmap(source, image.OutputFileType, image.Path);
+
+            if (File.Exists(image.Path))
+            {
+                FileInfo info = new FileInfo(image.Path);
+                newSize = info.Length;
+            }
+
+            image.FileSizeTooLarge = (newSize > 204800 && oldSize <= 204800);
         }
 
         private void OnGeneratingSet(OutputSet set)

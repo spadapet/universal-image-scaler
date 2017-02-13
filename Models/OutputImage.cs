@@ -8,6 +8,7 @@ namespace UniversalImageScaler.Models
         private OutputSet owner;
         private bool generate;
         private bool enabled;
+        private bool fileSizeTooLarge;
 
         public OutputImage(OutputSet owner)
         {
@@ -48,6 +49,19 @@ namespace UniversalImageScaler.Models
                 {
                     this.generate = value;
                     this.OnPropertyChanged(nameof(this.Generate));
+                }
+            }
+        }
+
+        public bool FileSizeTooLarge
+        {
+            get { return this.fileSizeTooLarge; }
+            set
+            {
+                if (this.fileSizeTooLarge != value)
+                {
+                    this.fileSizeTooLarge = value;
+                    this.OnPropertyChanged(nameof(this.FileSizeTooLarge));
                 }
             }
         }
