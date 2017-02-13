@@ -12,6 +12,7 @@ using OLECMDF = Microsoft.VisualStudio.OLE.Interop.OLECMDF;
 using Task = System.Threading.Tasks.Task;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace UniversalImageScaler
 {
@@ -43,8 +44,9 @@ namespace UniversalImageScaler
                         if (result == true)
                         {
                             TelemetryHelpers.TrackDialogOk(source);
-                            await GenerateImagesMainThread(source);
+                            await this.GenerateImagesMainThread(source);
                             TelemetryHelpers.TrackGenerateSuccess(source);
+                            this.DeleteLargeImagesMainThread(source);
                         }
                         else
                         {
@@ -87,27 +89,27 @@ namespace UniversalImageScaler
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken token = tokenSource.Token;
 
-            Task task = Task.Run(() => GenerateImagesBackgroundThread(source, token, pump), token);
+            Task task = Task.Run(() => this.GenerateImagesBackgroundThread(source, token, pump), token);
 
             CommonMessagePumpExitCode code = pump.ModalWaitForHandles(((IAsyncResult)task).AsyncWaitHandle);
             tokenSource.Cancel();
             await task;
+        }
 
+        private void DeleteLargeImagesMainThread(SourceImage source)
+        {
             List<OutputImage> largeImages = new List<OutputImage>();
-            if (source.Feature != null && source.Feature.CheckFileSize)
+            foreach (OutputImage image in source.ImagesToGenerate)
             {
-                foreach (OutputImage image in source.ImagesToGenerate)
+                if (image.FileSizeTooLarge)
                 {
-                    if (image.FileSizeTooLarge)
-                    {
-                        largeImages.Add(image);
-                    }
+                    largeImages.Add(image);
                 }
             }
 
             if (largeImages.Count > 0)
             {
-                // TODO: Stuff
+                // TODO: Show dialog
             }
         }
 
@@ -143,13 +145,10 @@ namespace UniversalImageScaler
 
         private void GenerateImage(OutputImage image)
         {
-            long oldSize = 0;
-            long newSize = 0;
-
             if (File.Exists(image.Path))
             {
                 FileInfo info = new FileInfo(image.Path);
-                oldSize = info.Length;
+                image.OldFileSize = info.Length;
             }
 
             SourceImage sourceImage = image.Owner.Owner;
@@ -159,10 +158,8 @@ namespace UniversalImageScaler
             if (File.Exists(image.Path))
             {
                 FileInfo info = new FileInfo(image.Path);
-                newSize = info.Length;
+                image.NewFileSize = info.Length;
             }
-
-            image.FileSizeTooLarge = (newSize > 204800 && oldSize <= 204800);
         }
 
         private void OnGeneratingSet(OutputSet set)

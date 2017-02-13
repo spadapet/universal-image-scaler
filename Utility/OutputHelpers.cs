@@ -10,6 +10,8 @@ namespace UniversalImageScaler.Utility
 {
     internal static class OutputHelpers
     {
+        private const int maxWindowsStoreFileSize = 204800;
+
         public static IImage CreateDesignTimeSourceImage()
         {
             byte[] bytes = new byte[32 * 32 * 4];
@@ -65,6 +67,7 @@ namespace UniversalImageScaler.Utility
                 bothFeature = new OutputFeature("Square and wide manifest images (for app store)")
                 {
                     Tooltip = "Recommended source image size: 1240px x 1240px",
+                    MaxFileSize = OutputHelpers.maxWindowsStoreFileSize,
                 };
 
                 foreach (OutputSet set in squareFeature.Sets)
@@ -126,6 +129,7 @@ namespace UniversalImageScaler.Utility
             OutputFeature feature = new OutputFeature("Square manifest images (for app store)")
             {
                 Tooltip = "Recommended source image size: 1240px x 1240px",
+                MaxFileSize = OutputHelpers.maxWindowsStoreFileSize,
             };
 
             OutputSet[] sets = new OutputSet[]
@@ -192,6 +196,7 @@ namespace UniversalImageScaler.Utility
             OutputFeature feature = new OutputFeature("Wide manifest images (for app store)")
             {
                 Tooltip = "Recommended source image size: 2480px x 1200px",
+                MaxFileSize = OutputHelpers.maxWindowsStoreFileSize,
             };
 
             OutputSet[] sets = new OutputSet[]

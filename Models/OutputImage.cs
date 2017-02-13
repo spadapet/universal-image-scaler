@@ -8,7 +8,8 @@ namespace UniversalImageScaler.Models
         private OutputSet owner;
         private bool generate;
         private bool enabled;
-        private bool fileSizeTooLarge;
+        private long oldFileSize;
+        private long newFileSize;
 
         public OutputImage(OutputSet owner)
         {
@@ -55,12 +56,40 @@ namespace UniversalImageScaler.Models
 
         public bool FileSizeTooLarge
         {
-            get { return this.fileSizeTooLarge; }
+            get
+            {
+                OutputFeature feature = this.SourceImage.Feature;
+
+                return feature != null &&
+                    feature.HasMaxFileSize &&
+                    this.oldFileSize <= feature.MaxFileSize &&
+                    this.NewFileSize > feature.MaxFileSize;
+            }
+        }
+
+        public long OldFileSize
+        {
+            get { return this.oldFileSize; }
             set
             {
-                if (this.fileSizeTooLarge != value)
+                if (this.oldFileSize != value)
                 {
-                    this.fileSizeTooLarge = value;
+                    this.oldFileSize = value;
+                    this.OnPropertyChanged(nameof(this.OldFileSize));
+                    this.OnPropertyChanged(nameof(this.FileSizeTooLarge));
+                }
+            }
+        }
+
+        public long NewFileSize
+        {
+            get { return this.newFileSize; }
+            set
+            {
+                if (this.newFileSize != value)
+                {
+                    this.newFileSize = value;
+                    this.OnPropertyChanged(nameof(this.NewFileSize));
                     this.OnPropertyChanged(nameof(this.FileSizeTooLarge));
                 }
             }
