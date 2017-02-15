@@ -50,6 +50,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ImageResizeCommand.cs" />
+    <Compile Include="DeleteLargeImagesDialog.xaml.cs">
+      <DependentUpon>DeleteLargeImagesDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ImageResizeDialog.xaml.cs">
       <DependentUpon>ImageResizeDialog.xaml</DependentUpon>
     </Compile>
@@ -79,7 +82,6 @@
     <Compile Include="Models\ModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\SelectionHelpers.cs" />
-    <Compile Include="Utility\TelemetryHelpers.cs" />
     <Compile Include="Utility\WpfHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -223,6 +225,10 @@
     <Resource Include="Resources\info.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="DeleteLargeImagesDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ImageResizeDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

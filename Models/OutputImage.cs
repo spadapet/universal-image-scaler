@@ -8,6 +8,7 @@ namespace UniversalImageScaler.Models
         private OutputSet owner;
         private bool generate;
         private bool enabled;
+        private bool markedForDeletion;
         private long oldFileSize;
         private long newFileSize;
 
@@ -104,6 +105,19 @@ namespace UniversalImageScaler.Models
                 {
                     this.enabled = value;
                     this.OnPropertyChanged(nameof(this.Enabled));
+                }
+            }
+        }
+
+        public bool MarkedForDeletion
+        {
+            get { return this.markedForDeletion; }
+            set
+            {
+                if (this.markedForDeletion != value)
+                {
+                    this.markedForDeletion = value;
+                    this.OnPropertyChanged(nameof(this.MarkedForDeletion));
                 }
             }
         }

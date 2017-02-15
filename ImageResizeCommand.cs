@@ -37,28 +37,18 @@ namespace UniversalImageScaler
                 {
                     using (SourceImage source = new SourceImage(sel))
                     {
-                        TelemetryHelpers.TrackDialogOpen(source);
                         ImageResizeDialog dialog = new ImageResizeDialog(source);
                         bool? result = dialog.ShowModal();
 
                         if (result == true)
                         {
-                            TelemetryHelpers.TrackDialogOk(source);
                             await this.GenerateImagesMainThread(source);
-                            TelemetryHelpers.TrackGenerateSuccess(source);
-                            this.DeleteLargeImagesMainThread(source);
-                        }
-                        else
-                        {
-                            TelemetryHelpers.TrackDialogCancel(source);
                         }
                     }
-
-                    TelemetryHelpers.Flush();
                 }
-                catch (Exception ex)
+                catch
                 {
-                    TelemetryHelpers.TrackException(ex);
+                    // Don't let exceptions escape and take down VS
                 }
             }
         }
@@ -94,22 +84,30 @@ namespace UniversalImageScaler
             CommonMessagePumpExitCode code = pump.ModalWaitForHandles(((IAsyncResult)task).AsyncWaitHandle);
             tokenSource.Cancel();
             await task;
+            await this.DeleteLargeImages(source);
         }
 
-        private void DeleteLargeImagesMainThread(SourceImage source)
+        private async Task DeleteLargeImages(SourceImage source)
         {
             List<OutputImage> largeImages = new List<OutputImage>();
             foreach (OutputImage image in source.ImagesToGenerate)
             {
                 if (image.FileSizeTooLarge)
                 {
+                    image.MarkedForDeletion = true;
                     largeImages.Add(image);
                 }
             }
 
             if (largeImages.Count > 0)
             {
-                // TODO: Show dialog
+                DeleteLargeImagesDialog dialog = new DeleteLargeImagesDialog(largeImages);
+                bool? result = dialog.ShowModal();
+
+                if (result == true)
+                {
+                    await this.DeleteImagesMainThread(largeImages.Where(i => i.MarkedForDeletion));
+                }
             }
         }
 
@@ -139,6 +137,57 @@ namespace UniversalImageScaler
                     mainThreadPump.WaitText = $"Adding to the project ({curImage} of {totalImages}):\r\n{image.Path}";
                     this.GenerateImage(image);
                     this.OnGeneratedImage(image);
+                }
+            }
+        }
+
+        private async Task DeleteImagesMainThread(IEnumerable<OutputImage> images)
+        {
+            CommonMessagePump pump = new CommonMessagePump();
+            pump.AllowCancel = true;
+            pump.WaitTitle = "Deleting large images";
+            pump.WaitText = "Deleting files takes time...";
+
+            CancellationTokenSource tokenSource = new CancellationTokenSource();
+            CancellationToken token = tokenSource.Token;
+
+            Task task = Task.Run(() => this.DeleteImagesBackgroundThread(images, token, pump), token);
+
+            CommonMessagePumpExitCode code = pump.ModalWaitForHandles(((IAsyncResult)task).AsyncWaitHandle);
+            tokenSource.Cancel();
+            await task;
+        }
+
+        private void DeleteImagesBackgroundThread(IEnumerable<OutputImage> images, CancellationToken token, CommonMessagePump mainThreadPump)
+        {
+            int totalImages = images.Count();
+            int curImage = 0;
+
+            foreach (OutputImage image in images)
+            {
+                if (!token.IsCancellationRequested)
+                {
+                    curImage++;
+                    mainThreadPump.WaitText = $"Deleting {curImage} of {totalImages}:\r\n{image.Path}";
+
+                    IVsHierarchy hierarchy = image.Owner.Owner.Item.pHier;
+                    uint itemId = hierarchy.FindItemId(image.Path);
+                    if (itemId != 0)
+                    {
+                        DteHelpers.RemoveItemId(hierarchy, itemId);
+
+                        if (File.Exists(image.Path))
+                        {
+                            try
+                            {
+                                File.Delete(image.Path);
+                            }
+                            catch
+                            {
+                                // don't care
+                            }
+                        }
+                    }
                 }
             }
         }

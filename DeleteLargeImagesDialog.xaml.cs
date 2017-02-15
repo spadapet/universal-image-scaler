@@ -5,37 +5,26 @@ using System.Windows;
 using Microsoft.VisualStudio.PlatformUI;
 using UniversalImageScaler.Models;
 using UniversalImageScaler.Utility;
+using System.Collections.ObjectModel;
 
 namespace UniversalImageScaler
 {
-    internal partial class ImageResizeDialog : DialogWindow
+    internal partial class DeleteLargeImagesDialog : DialogWindow
     {
-        private SourceImage item;
+        private ObservableCollection<OutputImage> largeImages;
 
-        public ImageResizeDialog()
-            : this(new SourceImage())
+        public DeleteLargeImagesDialog()
+            : this(new OutputImage[0])
         {
             Debug.Assert(WpfHelpers.IsDesignMode);
         }
 
-        public ImageResizeDialog(SourceImage item)
+        public DeleteLargeImagesDialog(IEnumerable<OutputImage> largeImages)
         {
-            this.item = item;
-            this.DataContext = item;
+            this.largeImages = new ObservableCollection<OutputImage>(largeImages);
+            this.DataContext = this.largeImages;
 
             this.InitializeComponent();
-        }
-
-        protected override void InvokeDialogHelp()
-        {
-            try
-            {
-                Process.Start("https://visualstudiogallery.msdn.microsoft.com/824f5375-b0c7-4d79-b9bf-04653876ba53");
-            }
-            catch (Exception ex)
-            {
-                Debug.Fail(ex.Message);
-            }
         }
 
         private void OnOk(object sender, RoutedEventArgs args)

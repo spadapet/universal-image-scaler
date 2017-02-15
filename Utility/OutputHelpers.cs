@@ -11,6 +11,7 @@ namespace UniversalImageScaler.Utility
     internal static class OutputHelpers
     {
         private const int maxWindowsStoreFileSize = 204800;
+        private const string maxWindowsStoreFileSizeString = "200K";
 
         public static IImage CreateDesignTimeSourceImage()
         {
@@ -68,6 +69,7 @@ namespace UniversalImageScaler.Utility
                 {
                     Tooltip = "Recommended source image size: 1240px x 1240px",
                     MaxFileSize = OutputHelpers.maxWindowsStoreFileSize,
+                    MaxFileSizeString = OutputHelpers.maxWindowsStoreFileSizeString,
                 };
 
                 foreach (OutputSet set in squareFeature.Sets)
@@ -130,6 +132,7 @@ namespace UniversalImageScaler.Utility
             {
                 Tooltip = "Recommended source image size: 1240px x 1240px",
                 MaxFileSize = OutputHelpers.maxWindowsStoreFileSize,
+                MaxFileSizeString = OutputHelpers.maxWindowsStoreFileSizeString,
             };
 
             OutputSet[] sets = new OutputSet[]
@@ -197,6 +200,7 @@ namespace UniversalImageScaler.Utility
             {
                 Tooltip = "Recommended source image size: 2480px x 1200px",
                 MaxFileSize = OutputHelpers.maxWindowsStoreFileSize,
+                MaxFileSizeString = OutputHelpers.maxWindowsStoreFileSizeString,
             };
 
             OutputSet[] sets = new OutputSet[]

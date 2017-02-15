@@ -10,6 +10,7 @@ namespace UniversalImageScaler.Models
         private bool allowChangeScale;
         private bool allowChangeSize;
         private long maxFileSize;
+        private string maxFileSizeString;
         private ObservableCollection<OutputSet> sets;
 
         public OutputFeature(string name)
@@ -86,6 +87,19 @@ namespace UniversalImageScaler.Models
                     this.maxFileSize = value;
                     this.OnPropertyChanged(nameof(this.MaxFileSize));
                     this.OnPropertyChanged(nameof(this.HasMaxFileSize));
+                }
+            }
+        }
+
+        public string MaxFileSizeString
+        {
+            get { return this.maxFileSizeString ?? this.MaxFileSize.ToString(); }
+            set
+            {
+                if (this.maxFileSizeString != value)
+                {
+                    this.maxFileSizeString = value;
+                    this.OnPropertyChanged(nameof(this.MaxFileSizeString));
                 }
             }
         }
