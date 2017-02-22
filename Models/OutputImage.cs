@@ -24,6 +24,15 @@ namespace UniversalImageScaler.Models
         public abstract string Path { get; }
         public abstract string DisplayText { get; }
 
+        public virtual string TooLargeDisplayText
+        {
+            get
+            {
+                string name = System.IO.Path.GetFileName(this.Path);
+                return $"{name} ({this.NewFileSize} bytes, for {this.Owner.Name})";
+            }
+        }
+
         public virtual void Initialize()
         {
             this.UpdateEnabled();

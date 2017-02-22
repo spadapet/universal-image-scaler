@@ -76,6 +76,7 @@ namespace UniversalImageScaler.Models
             this.OnPropertyChanged(nameof(this.PixelWidth));
             this.OnPropertyChanged(nameof(this.PixelHeight));
             this.OnPropertyChanged(nameof(this.DisplayText));
+            this.OnPropertyChanged(nameof(this.TooLargeDisplayText));
         }
     }
 }
