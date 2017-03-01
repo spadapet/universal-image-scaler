@@ -33,8 +33,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" TextWrapping="Wrap">
-            <Run>The maximum file size for a scaled image is 200 KB. The following image files ended up larger then 200 KB. Check which ones you would like to delete and then click OK.</Run><LineBreak />
-            <Hyperlink NavigateUri="https://msdn.microsoft.com/en-us/library/windows/apps/hh781198.aspx">Click here for more info.</Hyperlink>
+            <Run>The maximum file size for a scaled image is 200 KB. The following image files ended up larger then 200 KB. Check which ones you would like to delete and then click OK.</Run>
         </TextBlock>
         <ListBox Grid.Row="1" Margin="0,10" ItemsSource="{Binding}" />
         <Grid Grid.Row="2" Grid.IsSharedSizeScope="True" HorizontalAlignment="Right">
