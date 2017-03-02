@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
+using System.Linq;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -8,6 +8,23 @@ namespace UniversalImageScaler.Utility
 {
     internal static class DteHelpers
     {
+        public static bool IsCppProject(this IVsHierarchy hierarchy)
+        {
+            IVsAggregatableProject aggregateProject = hierarchy as IVsAggregatableProject;
+            string projectTypes;
+
+            if (aggregateProject != null && aggregateProject.GetAggregateProjectTypeGuids(out projectTypes) == 0)
+            {
+                string[] ids = projectTypes.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                if (ids.Contains("{8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942}", StringComparer.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static EnvDTE.ProjectItem FindProjectItem(this IServiceProvider serviceProvider, string file)
         {
             EnvDTE.DTE dte = serviceProvider.GetService(typeof(SDTE)) as EnvDTE.DTE;

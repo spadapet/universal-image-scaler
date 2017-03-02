@@ -253,8 +253,18 @@ namespace UniversalImageScaler
             {
                 IVsHierarchy hierarchy = outputImage.Owner.Owner.Item.pHier;
                 uint itemId = outputImage.Owner.Owner.Item.itemid;
-                uint parentId = hierarchy.FindParentId(itemId);
-                hierarchy.AddItem(parentId, outputImage.Path);
+
+                if (hierarchy.IsCppProject())
+                {
+                    // IVsProject.AddItem is broken for C++ in VS 2017, so do this instead:
+                    EnvDTE.ProjectItem item = hierarchy.GetProjectItem(itemId);
+                    item.Collection.AddFromFile(outputImage.Path);
+                }
+                else
+                {
+                    uint parentId = hierarchy.FindParentId(itemId);
+                    hierarchy.AddItem(parentId, outputImage.Path);
+                }
             });
         }
     }
