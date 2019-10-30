@@ -1,27 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
-  <Metadata>
-    <Identity Id="UniversalImageScaler.Peter Spada.7d4f0e00-00ae-49fa-bfe7-d3ffb5384d50" Version="1.6" Language="en-US" Publisher="Peter Spada" />
-    <DisplayName>Windows Universal App Image Scaler</DisplayName>
-    <Description xml:space="preserve">This extension takes large source images and creates resized copies that are used in Windows Universal Apps. It can also create all of the manifest images like app logos and splash screens. Right click an image file to access this extension.</Description>
-    <MoreInfo>https://github.com/spadapet/universal-image-scaler</MoreInfo>
-    <GettingStartedGuide>https://visualstudiogallery.msdn.microsoft.com/824f5375-b0c7-4d79-b9bf-04653876ba53</GettingStartedGuide>
-    <ReleaseNotes>https://visualstudiogallery.msdn.microsoft.com/824f5375-b0c7-4d79-b9bf-04653876ba53</ReleaseNotes>
-    <Icon>Resources\ImageResizePackage.ico</Icon>
-    <PreviewImage>Resources\preview.png</PreviewImage>
-    <Tags>image, resize, resizing, image resize, image resizing</Tags>
-  </Metadata>
-  <Installation>
-    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0,15.0]" />
-  </Installation>
-  <Dependencies>
-    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
-    <Dependency Id="Microsoft.VisualStudio.MPF.14.0" DisplayName="Visual Studio MPF 14.0" d:Source="Installed" Version="[14.0]" />
-  </Dependencies>
-  <Assets>
-    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
-  </Assets>
-  <Prerequisites>
-    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
-  </Prerequisites>
+    <Metadata>
+        <Identity Id="UniversalImageScaler.Peter Spada.7d4f0e00-00ae-49fa-bfe7-d3ffb5384d50" Version="1.7" Language="en-US" Publisher="Peter Spada" />
+        <DisplayName>Windows Universal App Image Scaler</DisplayName>
+        <Description xml:space="preserve">This extension takes large source images and creates resized copies that are used in Windows Universal Apps. It can also create all of the manifest images like app logos and splash screens. Right click an image file to access this extension.</Description>
+        <MoreInfo>https://github.com/spadapet/universal-image-scaler</MoreInfo>
+        <GettingStartedGuide>https://marketplace.visualstudio.com/items?itemName=PeterSpa.WindowsUniversalAppImageScaler</GettingStartedGuide>
+        <ReleaseNotes>https://marketplace.visualstudio.com/items?itemName=PeterSpa.WindowsUniversalAppImageScaler</ReleaseNotes>
+        <Icon>Resources\ImageResizePackage.ico</Icon>
+        <PreviewImage>Resources\preview.png</PreviewImage>
+        <Tags>image, resize, resizing, image resize, image resizing</Tags>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0,17.0)" />
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+        <Dependency Id="Microsoft.VisualStudio.MPF.14.0" DisplayName="Visual Studio MPF 14.0" d:Source="Installed" Version="[14.0]" />
+    </Dependencies>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+    </Assets>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,17.0)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
 </PackageManifest>
